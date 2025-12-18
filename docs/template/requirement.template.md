@@ -256,32 +256,6 @@ _セマンティックカラー_
 - Text secondary / Background: 4.5:1 以上
 - Interactive elements: 3:1 以上
 
-### 8.2 Tailwind Config マッピング例
-
-```typescript
-// tailwind.config.ts
-export default {
-  darkMode: "class", // or 'media' for system preference
-  theme: {
-    extend: {
-      colors: {
-        primary: {
-          DEFAULT: "#000000",
-          hover: "#000000",
-          dark: "#FFFFFF", // ダークモード用
-          "dark-hover": "#E5E5E5",
-        },
-        background: {
-          light: "#FFFFFF",
-          dark: "#0A0A0A",
-        },
-        // ...
-      },
-    },
-  },
-};
-```
-
 **実装パターン**
 
 - Tailwind の `dark:` バリアントを使用: `bg-white dark:bg-black`

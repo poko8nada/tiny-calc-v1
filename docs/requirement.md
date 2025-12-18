@@ -256,6 +256,8 @@ tiny-calc-v1/
 - 点滅カーソルアニメーション
 - テキストグロー効果（オプション）
 
+**note**: pタグは半角スペースの連続入力を省略するので、必要に応じpreタグを使用する。
+
 ### カラーモード対応
 
 - **ライトモード**: 不要
@@ -324,59 +326,6 @@ const firaCode = Fira_Code({
 - プログラミングリガチャ対応
 - 優れた可読性
 - ターミナル風の雰囲気
-
-### Tailwind Config マッピング
-
-```typescript
-// tailwind.config.ts
-import type { Config } from "tailwindcss";
-
-const config: Config = {
-  darkMode: "class",
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
-  theme: {
-    extend: {
-      colors: {
-        terminal: {
-          bg: "#0C0C0C",
-          surface: "#1A1A1A",
-          "surface-highlight": "#242424",
-          gold: "#FFD700",
-          amber: "#FFA500",
-          muted: "#CC8400",
-          cyan: "#00D787",
-          mint: "#5AF78E",
-          red: "#FF6B6B",
-          "border-dim": "#CC8400",
-        },
-      },
-      fontFamily: {
-        mono: ["var(--font-mono)", "monospace"],
-      },
-      boxShadow: {
-        glow: "0 0 10px rgba(255, 215, 0, 0.3)",
-        "glow-sm": "0 0 5px rgba(255, 215, 0, 0.2)",
-      },
-      animation: {
-        "cursor-blink": "blink 1s step-end infinite",
-      },
-      keyframes: {
-        blink: {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0" },
-        },
-      },
-    },
-  },
-  plugins: [],
-};
-
-export default config;
-```
 
 ### ターミナルエフェクト (globals.css)
 

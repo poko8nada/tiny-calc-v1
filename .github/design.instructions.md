@@ -16,48 +16,68 @@
 
 ### Tech Stack
 
-**Default**: Tailwind CSS + shadcn/ui (or similar Tailwind-based component libraries)
+**Default**: Tailwind CSS v4 + shadcn/ui (or similar Tailwind-based component libraries)
 
+- **CSS variables via `@theme` directive** for all custom design tokens
 - **Respect Tailwind defaults** for typography, spacing, responsive breakpoints
-- **Customize colors only** to match brand identity
 - Component libraries are built on Tailwind - follow their conventions
 - Avoid overriding built-in accessibility features
 
 ## Customization Guidelines
 
+### Structure
+
+```css
+/* globals.css */
+@import "tailwindcss";
+
+@theme inline {
+  /* Colors */
+  --color-primary-500: #0ea5e9;
+  --color-terminal-gold: #f4bf4f;
+  --color-terminal-cyan: #4fb4d8;
+  --color-terminal-bg: #1a1a1a;
+
+  /* Semantic colors */
+  --color-success: #10b981;
+  --color-error: #ef4444;
+}
+
+/* Custom utilities */
+.glow {
+  box-shadow: 0 0 10px var(--color-terminal-cyan);
+}
+```
+
 ### Colors (Primary Customization Area)
 
-Provide color tokens mapped to Tailwind config:
+Define color tokens in `@theme inline` block:
 
 - Primary, secondary, accent colors (hex codes)
 - Neutral scale (gray-50 to gray-900)
 - Semantic colors (success, warning, error, info)
 - **Ensure contrast ratios**: minimum 4.5:1 (text), 3:1 (UI components)
 
-### Example
+### Usage in Components
 
-```typescript
-// tailwind.config.ts
-export default {
-  theme: {
-    extend: {
-      colors: {
-        primary: {
-          50: "#f0f9ff",
-          // ...
-          900: "#0c4a6e",
-        },
-      },
-    },
-  },
-};
+```tsx
+<div className="bg-terminal-bg text-terminal-fg">
+  <h1 className="text-terminal-gold glow">Terminal Style</h1>
+</div>
 ```
 
-## Accessibility Requirements
+## Best Practices
 
-- Minimum contrast ratio: 4.5:1 (text), 3:1 (UI components)
-- Keyboard navigation support
-- Focus indicators (visible outline)
-- ARIA labels for interactive elements
-- Alt text for images
-- Semantic HTML structure
+### Do's ✓
+
+- Define all design tokens in `@theme inline`
+- Use Tailwind utilities (`bg-primary-500`, `text-terminal-gold`)
+- Leverage responsive prefixes (`md:`, `lg:`)
+- Use semantic naming (`--color-success`, not `--color-green`)
+
+### Don'ts ✗
+
+- Don't duplicate definitions in CSS and config
+- Don't create utility classes that duplicate Tailwind
+- Don't hardcode colors in CSS (use CSS variables)
+- Don't use `!important` (use Tailwind's specificity)
