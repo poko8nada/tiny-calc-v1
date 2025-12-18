@@ -98,6 +98,7 @@ function useCreatePost() {
 
 - No E2E tests
 - Test business logic and critical functions only
+- When connecting to API, tests for both normal and abnormal.
 - Skip UI components and trivial code
 - Place `*.test.ts(x)` adjacent to source files
 

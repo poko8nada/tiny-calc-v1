@@ -21,16 +21,16 @@
 
 ### MVP
 
-- **フロントエンド**: [Next.js / React / など]
+- **フロントエンド**: [Next.js / React / htmx / など]
 - **バックエンド**: [なし / Hono / Express / など]
-- **ホスティング**: [Vercel / Cloudflare Workers / など]
-- **認証**: [なし / Clerk / Auth0 / など]
-- **状態管理**: [React Context / Zustand / など]
-- **スタイリング/コンポーネント**: [Tailwind CSS / CSS Modules / など]
+- **ホスティング**: [Vercel / Cloudflare Workers / Cloud Run / など]
+- **認証**: [なし / Clerk / Auth0 /　better auth / など]
+- **状態管理**: [React Context / Zustand / nuqs / など]
+- **スタイリング/コンポーネント**: [Tailwind CSS / shadcn / react aria / など]
 - **テスト**: [Vitest / Testing Library / など]
 - **ORM+**: [なし / Drizzle ORM / Prisma / など]
-- **データベース**: [なし / PostgreSQL / など]
-- **その他**: [使用する主要ライブラリ・API]
+- **データベース**: [なし / D1 / Turso / Supabase / Neon /など]
+- **その他**: [その他、使用する主要ライブラリ・API]
 
 ### PRODUCT v1(製品版)
 
@@ -100,7 +100,7 @@
 **NFR-04: テスタビリティ**
 
 - [テスト方針]
-- 例: ビジネスロジックと重要な関数のみテスト対象。UIコンポーネントや自明なコードはテスト不要。
+- 例: ビジネスロジックと重要な関数のみテスト対象。APIとの接続は、正常系と異常系どちらもテストを行う。UIコンポーネントや自明なコードはテスト不要。
 
 **NFR-05: セキュリティ**
 
@@ -154,7 +154,7 @@ project-name/
    └─ [assets]
 ```
 
-**Note:** [For project structure and component organization, refer to your project's architecture guide in `arch/`.]
+**Note:** [プロジェクト構造とコンポーネントの構成については、`arch/` ディレクトリ内のプロジェクトアーキテクチャガイドを参照する。]
 
 ---
 
@@ -167,9 +167,30 @@ project-name/
 
 ---
 
-### 7. デザインシステム (Design System)
+## 7. 画面設計 (Screen Design)
 
-#### 7.1. カラーパレット (Color Palette)
+### 7.1. 画面一覧 (Screen List)
+
+| No  | 画面名   | URLパス     | 機能概要               | 備考 |
+| --- | -------- | ----------- | ---------------------- | ---- |
+| 001 | ホーム   | `/`         | サービスのトップページ |      |
+| XXX | [画面名] | `[URLパス]` | [機能]                 |      |
+
+### 7.2. 画面フロー図 (Screen Flow Diagram)
+
+[画面フロー図の挿入場所]
+
+### 7.3. ワイヤーフレーム・モックアップ (Wireframes & Mockups)
+
+[ワイヤーフレーム・モックアップの挿入場所]
+
+**Note**: 画面フロー図、ワイヤーフレーム・モックアップは、簡易的なもので構わない。またFigmaやMiroなどの外部ツールで管理している場合、そのリンクを記載する。
+
+---
+
+## 8. デザインシステム (Design System)
+
+### 8.1. カラーパレット (Color Palette)
 
 **カラーモード対応**
 
@@ -231,16 +252,11 @@ _セマンティックカラー_
 
 **コントラスト比**
 
-- ライトモード:
-  - Text primary / Background: 4.5:1 以上（WCAG AA準拠）
-  - Text secondary / Background: 4.5:1 以上
-  - Interactive elements: 3:1 以上
-- ダークモード:
-  - Text primary / Background: 4.5:1 以上（WCAG AA準拠）
-  - Text secondary / Background: 4.5:1 以上
-  - Interactive elements: 3:1 以上
+- Text primary / Background: 4.5:1 以上（WCAG AA準拠）
+- Text secondary / Background: 4.5:1 以上
+- Interactive elements: 3:1 以上
 
-**Tailwind Config マッピング例**
+### 8.2 Tailwind Config マッピング例
 
 ```typescript
 // tailwind.config.ts
@@ -276,7 +292,7 @@ export default {
 
 ---
 
-## 8. 備考・参考資料 (Notes & References)
+## 9. 備考・参考資料 (Notes & References)
 
 - [参考URL]
 - [デザインモックアップ]
