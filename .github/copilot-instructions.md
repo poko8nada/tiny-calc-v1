@@ -30,6 +30,21 @@ When user input contains these keywords → **STOP & REQUEST APPROVAL**
 
 ---
 
+## Git Workflow
+
+### Basic
+
+- **Commit Format:** `<type>: <description>`
+- **Types:** add, fix, remove, update, WIP
+
+### Rules
+
+- English, imperative mood (Add, Update, Fix)
+- Lowercase description, no period
+- Be specific and concise
+
+---
+
 ## Reference Documents
 
 For detailed guidelines, refer to:
