@@ -4,11 +4,11 @@
 
 ### Task 1.1: プロジェクト初期化・依存関係インストール
 
-- [ ] `package.json` - 依存関係追加（Next.js 16, React 19, Tailwind CSS, math.js, Vitest）
-- [ ] `pnpm install` - 依存パッケージインストール
-- [ ] `next.config.js` - Cloud Run用設定（output: 'standalone'）
-- [ ] `tsconfig.json` - TypeScript設定確認
-- [ ] `.gitignore` - 不要ファイル除外設定
+- [x] `package.json` - 依存関係追加（Next.js 16, React 19, Tailwind CSS, math.js, Vitest）
+- [x] `pnpm install` - 依存パッケージインストール
+- [x] `next.config.js` - Cloud Run用設定（output: 'standalone'）
+- [x] `tsconfig.json` - TypeScript設定確認
+- [x] `.gitignore` - 不要ファイル除外設定
 
 **依存関係**: なし  
 **成果物**: 実行可能なNext.jsプロジェクト環境  
@@ -17,9 +17,9 @@
 
 ### Task 1.2: Tailwind CSS + ターミナルテーマ設定
 
-- [ ] `tailwind.config.ts` - ターミナルテーマ用カラーパレット設定（Modern Terminal - Amber/Black）
-- [ ] `app/globals.css` - ターミナルエフェクト（glow, cursor blink, ASCII border）追加
-- [ ] `postcss.config.js` - PostCSS設定確認
+- [x] `tailwind.config.ts` - ターミナルテーマ用カラーパレット設定（Modern Terminal - Amber/Black）
+- [x] `app/globals.css` - ターミナルエフェクト（glow, cursor blink, ASCII border）追加
+- [x] `postcss.config.js` - PostCSS設定確認
 
 **依存関係**: Task 1.1  
 **成果物**: ターミナル風スタイリング基盤  
@@ -28,9 +28,9 @@
 
 ### Task 1.3: Fira Code フォント設定
 
-- [ ] `app/layout.tsx` - Fira Code フォント読み込み（next/font/google）
-- [ ] フォント変数設定（--font-mono）
-- [ ] メタデータ設定（title, description, OGP準備）
+- [x] `app/layout.tsx` - Fira Code フォント読み込み（next/font/google）
+- [x] フォント変数設定（--font-mono）
+- [x] メタデータ設定（title, description, OGP準備）
 
 **依存関係**: Task 1.2  
 **成果物**: Fira Code適用済みRoot Layout（FR-07）  
@@ -53,7 +53,7 @@
   - Fira Codeが適用されていること
   - アニメーション・エフェクトが動作すること
   - レスポンシブ表示確認
-- [ ] 確認完了後、テストコンポーネント削除またはコメントアウト
+- [ ] 確認完了後、テストコンポーネントコメントアウト
 
 **依存関係**: Task 1.3  
 **成果物**: ターミナルテーマ動作確認済み環境  
