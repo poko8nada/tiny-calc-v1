@@ -205,7 +205,7 @@
 
 ## 5. ディレクトリ構成と作成ファイル (Directory Structure & Files)
 
-### MVP実装時のディレクトリ構成
+### 5.1. MVP実装時のディレクトリ構成
 
 ```
 tiny-calc-v1/
@@ -422,7 +422,28 @@ export default config;
 
 ---
 
-## 7. 外部リソース・ライセンス (External Resources & Licenses)
+## 7. 画面設計 (Screen Design)
+
+### 7.1. 画面一覧 (Screen List)
+
+| No  | 画面名 | URLパス | 機能概要               | 備考       |
+| --- | ------ | ------- | ---------------------- | ---------- |
+| 001 | ホーム | `/`     | 式入力・計算・履歴管理 | メイン画面 |
+
+### 7.2. 画面フロー図 (Screen Flow Diagram)
+
+```
+[ホーム画面]
+  ├─ 式入力エリア (入力・編集)
+  ├─ 計算ボタン (計算実行)
+  └─ 計算履歴パネル (履歴表示・復元)
+```
+
+**Note**: MVP段階では単一画面構成。画面フロー・ワイヤーフレームは簡易的な構成とする。
+
+---
+
+## 8. 外部リソース・ライセンス (External Resources & Licenses)
 
 | リソース     | 用途                | ライセンス | クレジット表記                     |
 | ------------ | ------------------- | ---------- | ---------------------------------- |
@@ -435,7 +456,7 @@ export default config;
 
 ---
 
-## 8. MVP制約・スコープ
+## 9. MVP制約・スコープ
 
 ### MVPに含まれない機能
 
@@ -457,7 +478,7 @@ export default config;
 
 ---
 
-## 9. Cloud Run デプロイ要件
+## 10. Cloud Run デプロイ要件
 
 ### Dockerfile構成
 
@@ -531,7 +552,7 @@ gcloud run deploy tiny-calc \
 
 ---
 
-## 10. 備考・参考資料 (Notes & References)
+## 11. 備考・参考資料 (Notes & References)
 
 - [Next.js 15 Documentation](https://nextjs.org/docs)
 - [math.js Documentation](https://mathjs.org/docs/)
