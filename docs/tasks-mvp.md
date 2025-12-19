@@ -39,7 +39,7 @@
 
 ### Task 1.4: ターミナルテーマ視覚確認用テストコンポーネント作成
 
-- [ ] `app/_components/ThemeTestComponent.tsx` - ターミナルテーマ確認用ミニマムコンポーネント
+- [x] `app/_components/ThemeTestComponent.tsx` - ターミナルテーマ確認用ミニマムコンポーネント
   - カラーパレット表示（terminal-gold, terminal-amber, terminal-cyan等）
   - Fira Code フォント表示確認
   - ASCII枠線表示（`┌─┐│└┘`）
@@ -47,13 +47,13 @@
   - テキストグロー効果確認
   - ホバー・フォーカス状態確認
   - コントラスト比視認性確認
-- [ ] `app/page.tsx` - テストコンポーネント一時配置
-- [ ] ブラウザで視覚確認
+- [x] `app/page.tsx` - テストコンポーネント一時配置
+- [x] ブラウザで視覚確認
   - 全カラーが想定通り表示されること
   - Fira Codeが適用されていること
   - アニメーション・エフェクトが動作すること
   - レスポンシブ表示確認
-- [ ] 確認完了後、テストコンポーネントコメントアウト
+- [x] 確認完了後、テストコンポーネントコメントアウト
 
 **依存関係**: Task 1.3  
 **成果物**: ターミナルテーマ動作確認済み環境  
@@ -66,7 +66,7 @@
 
 ### Task 2.1: 共通型定義
 
-- [ ] `utils/types.ts` - `Result<T, E>` 型定義、`CalculationRecord` 型定義
+- [x] `utils/types.ts` - `Result<T, E>` 型定義
 
 **依存関係**: Task 1.1  
 **成果物**: プロジェクト全体で使用する型定義  
@@ -75,7 +75,7 @@
 
 ### Task 2.2: 式評価ロジック実装
 
-- [ ] `utils/evaluateExpression.ts` - math.jsを使用した式評価関数（FR-01）
+- [x] `utils/evaluateExpression.ts` - math.jsを使用した式評価関数（FR-01）
   - `evaluateExpression(expression: string): Result<number, string>` 実装
   - セキュリティ対策（許可リスト方式）
   - エラーハンドリング（構文エラー、未定義変数、除算ゼロ等）
