@@ -77,10 +77,10 @@
 
 - **要件**: 計算結果をリアルタイムで表示
 - **詳細**:
-  - 結果が正常の場合は数値表示（小数点以下第5位まで）
-  - エラーの場合はエラーメッセージ表示
-  - 結果のコピー機能（ワンクリック）
-- **Props**: `{ result: Result<number, string> }`
+  - 結果が正常の場合は数値表示（小数点以下第5位まで、カラー: `terminal-cyan`）
+  - エラーの場合はエラーメッセージ表示（カラー: `terminal-red`、入力と同じ行に表示）
+  - 結果のコピー機能（明示的な `[ COPY ]` ボタン）
+- **Props**: `{ currentResult: { expression: string, value: number | string, isError: boolean } }`
 - **テスト観点**: [手動確認]
 
 ### 3.2. 計算履歴管理
@@ -128,9 +128,9 @@
 
 - **要件**: メインページ（入力、結果、履歴の統合レイアウト）
 - **詳細**:
-  - デスクトップ: 左側 70% に入力フォーム + 結果、右側 30% に計算履歴
-  - タブレット: 上下分割レイアウト
-  - モバイル: 履歴はドロワーまたはアコーディオン
+  - 画面上部: 入力フォーム + 最新の結果を固定表示（Fixed Header）
+  - 画面下部: 過去の計算履歴をスクロール表示（Scrollable History）
+  - PC/モバイル共通: シングルカラムのターミナル・エミュレータ風レイアウト
   - レスポンシブデザイン
   - ダークモード固定
 - **テスト観点**: [手動確認]
@@ -222,11 +222,11 @@ tiny-calc-v1/
 │  ├─ globals.css                   # Tailwind styles + Terminal effects
 │  ├─ _features/                    # Feature-based modules
 │  │  └─ DisplayCalculator/
-│  │     └─ index.tsx               # Main calculator feature logic
+│  │     └─ index.tsx               # FR-06: Main calculator feature (Fixed Header + History)
 │  ├─ _components/                  # Shared UI components
 │  │  ├─ CalculatorInput.tsx        # FR-02: Input form component
 │  │  ├─ CalculatorResult.tsx       # FR-03: Result display component
-│  │  ├─ HistoryPanel.tsx           # FR-05: History panel component
+│  │  ├─ HistoryPanel.tsx           # FR-05: History list component
 │  │  └─ ThemeTestComponent.tsx     # FR-08: Theme verification component (temporary)
 │  ├─ _hooks/
 │  │  └─ useCalculationHistory.ts   # FR-04b: History management hook
@@ -396,9 +396,10 @@ const firaCode = Fira_Code({
 
 ```
 [ホーム画面]
-  ├─ 式入力エリア (入力・編集)
-  ├─ 計算ボタン (計算実行)
-  └─ 計算履歴パネル (履歴表示・復元)
+  ├─ 固定ヘッダー (Fixed Header)
+  │   ├─ 式入力プロンプト (CalculatorInput)
+  │   └─ 最新の計算結果 (CalculatorResult)
+  └─ スクロール履歴エリア (HistoryPanel)
 ```
 
 **Note**: MVP段階では単一画面構成。画面フロー・ワイヤーフレームは簡易的な構成とする。
