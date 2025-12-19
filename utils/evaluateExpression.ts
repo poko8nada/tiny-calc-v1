@@ -1,6 +1,14 @@
-import { evaluate } from 'mathjs'
+import { all, create } from 'mathjs'
 import { ALLOWED_CONSTANTS, ALLOWED_FUNCTIONS } from './constants'
 import { err, ok, type Result } from './types'
+
+/**
+ * Configure mathjs to use BigNumber for arbitrary precision
+ */
+const math = create(all, {
+  number: 'BigNumber',
+  precision: 64,
+})
 
 /**
  * Pre-compute Sets for fast identifier validation
@@ -24,15 +32,18 @@ const ALLOWED_CONSTANTS_SET = new Set(
  * Security: Only allowlisted functions/constants are permitted
  *
  * @param expression - Mathematical expression string
+ * @param precision - Number of decimal places to round to (default: 2)
  * @returns Result<number, string> - { ok: true, value } or { ok: false, error }
  *
  * @example
  * evaluateExpression("2 + 3 * 4")     // { ok: true, value: 14 }
- * evaluateExpression("sin(PI/2)")     // { ok: true, value: 1 }
- * evaluateExpression("1/0")           // { ok: false, error: "..." }
- * evaluateExpression("process.exit") // { ok: false, error: "..." }
+ * evaluateExpression("0.1 + 0.2")     // { ok: true, value: 0.3 }
+ * evaluateExpression("1/0")           // { ok: false, error: "Division by zero" }
  */
-export function evaluateExpression(expression: string): Result<number, string> {
+export function evaluateExpression(
+  expression: string,
+  precision = 5,
+): Result<number, string> {
   const trimmed = expression.trim()
 
   if (trimmed.length === 0) {
@@ -62,19 +73,27 @@ export function evaluateExpression(expression: string): Result<number, string> {
   }
 
   try {
-    const result = evaluate(normalized)
+    let result = math.evaluate(normalized)
 
-    if (typeof result !== 'number' || !Number.isFinite(result)) {
+    // Round to specified precision while still a BigNumber to maintain accuracy
+    if (math.isBigNumber(result)) {
+      result = math.round(result, precision)
+    }
+
+    // Convert BigNumber to number and validate
+    const numericResult = math.isBigNumber(result) ? result.toNumber() : result
+
+    if (typeof numericResult !== 'number' || !Number.isFinite(numericResult)) {
       return err(
-        typeof result !== 'number'
+        typeof numericResult !== 'number'
           ? 'Result is not a number'
-          : Number.isNaN(result)
+          : Number.isNaN(numericResult)
             ? 'Result is NaN'
-            : 'Result is infinity',
+            : 'Division by zero',
       )
     }
 
-    return ok(result)
+    return ok(numericResult)
   } catch (error) {
     const msg =
       error instanceof Error ? error.message : 'Unknown evaluation error'

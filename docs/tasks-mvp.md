@@ -110,8 +110,8 @@
 
 ### Task 3.2: 結果表示コンポーネント実装
 
-- [ ] `app/_components/CalculatorResult.tsx` - 計算結果表示UI（FR-03）
-  - 結果数値表示（小数点以下第2位まで）
+- [x] `app/_components/CalculatorResult.tsx` - 計算結果表示UI（FR-03）
+  - 結果数値表示（小数点以下第5位まで）
   - ターミナル風スタイリング（gold/amber配色）
   - エラーメッセージ表示（赤色）
   - 結果コピー機能（ワンクリック）

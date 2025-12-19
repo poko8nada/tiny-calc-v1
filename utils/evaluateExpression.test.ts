@@ -17,13 +17,15 @@ describe('evaluateExpression', () => {
       expect(evaluateExpression('(1 + 2) * 3')).toEqual({ ok: true, value: 9 })
     })
 
-    it('should handle decimal numbers', () => {
-      const result = evaluateExpression('0.1 + 0.2')
-      expect(result.ok).toBe(true)
-      if (result.ok) {
-        // Floating point precision check
-        expect(result.value).toBeCloseTo(0.3)
-      }
+    it('should handle decimal numbers with high precision', () => {
+      expect(evaluateExpression('0.1 + 0.2')).toEqual({ ok: true, value: 0.3 })
+    })
+
+    it('should round to specified precision', () => {
+      // Default precision is 5
+      expect(evaluateExpression('1 / 3')).toEqual({ ok: true, value: 0.33333 })
+      // Custom precision
+      expect(evaluateExpression('1 / 3', 4)).toEqual({ ok: true, value: 0.3333 })
     })
   })
 
@@ -78,8 +80,17 @@ describe('evaluateExpression', () => {
       const result = evaluateExpression('1 / 0')
       expect(result.ok).toBe(false)
       if (!result.ok) {
-        expect(result.error).toBe('Result is infinity')
+        expect(result.error).toBe('Division by zero')
       }
+    })
+
+    it('should return error for non-numeric results', () => {
+      // sqrt(-1) returns a complex number in mathjs by default
+      const result = evaluateExpression('sqrt(-1)')
+      expect(result).toEqual({
+        ok: false,
+        error: 'Result is not a number',
+      })
     })
   })
 
