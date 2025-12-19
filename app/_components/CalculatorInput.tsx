@@ -33,16 +33,37 @@ export default function CalculatorInput({
 }: CalculatorInputProps) {
   const [input, setInput] = useState('')
   const [isFocused, setIsFocused] = useState(false)
+  const [cursorPosition, setCursorPosition] = useState(0)
+  const [cursorOffset, setCursorOffset] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
+  const measureRef = useRef<HTMLSpanElement>(null)
 
   // Focus input on mount and when clicking the container
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
 
+  const updateCursorPosition = (
+    e:
+      | ChangeEvent<HTMLInputElement>
+      | KeyboardEvent<HTMLInputElement>
+      | React.SyntheticEvent<HTMLInputElement>,
+  ) => {
+    const target = e.target as HTMLInputElement
+    setCursorPosition(target.selectionStart || 0)
+  }
+
+  // Update cursor pixel offset whenever position or input changes
+  useEffect(() => {
+    if (measureRef.current) {
+      setCursorOffset(measureRef.current.offsetWidth)
+    }
+  }, [cursorPosition, input])
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setInput(value)
+    updateCursorPosition(e)
 
     // Real-time evaluation
     if (onEvaluate) {
@@ -64,7 +85,11 @@ export default function CalculatorInput({
     if (e.key === 'Enter' && input.trim() !== '') {
       onSubmit?.(input)
       setInput('')
+      setCursorPosition(0)
       onEvaluate?.('', '', false)
+    } else {
+      // Use setTimeout to get the cursor position after the key event has been processed
+      setTimeout(() => updateCursorPosition(e), 0)
     }
   }
 
@@ -82,18 +107,32 @@ export default function CalculatorInput({
           value={input}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          onFocus={() => setIsFocused(true)}
+          onSelect={updateCursorPosition}
+          onClick={updateCursorPosition}
+          onFocus={(e) => {
+            setIsFocused(true)
+            updateCursorPosition(e)
+          }}
           onBlur={() => setIsFocused(false)}
           className='w-full bg-transparent border-none outline-none text-terminal-gold glow-text caret-transparent'
           spellCheck={false}
           autoComplete='off'
         />
 
+        {/* Mirror element for pixel-perfect measurement */}
+        <span
+          ref={measureRef}
+          className='absolute invisible whitespace-pre pointer-events-none font-mono text-lg'
+          aria-hidden='true'
+        >
+          {input.substring(0, cursorPosition)}
+        </span>
+
         {/* Custom Blinking Cursor */}
         <div
           className='absolute pointer-events-none h-[1.2em] w-[0.6em] bg-terminal-gold animate-cursor-blink opacity-70'
           style={{
-            left: `calc(${input.length}ch)`,
+            left: `${cursorOffset}px`,
             display: isFocused ? 'block' : 'none',
           }}
         />
