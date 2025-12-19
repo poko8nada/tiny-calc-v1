@@ -211,18 +211,22 @@
 tiny-calc-v1/
 ├─ app/
 │  ├─ layout.tsx                    # FR-07: Root layout
-│  ├─ page.tsx                      # FR-06: Main page
+│  ├─ page.tsx                      # FR-06: Main page (Entry point)
 │  ├─ globals.css                   # Tailwind styles + Terminal effects
-│  ├─ _components/
+│  ├─ _features/                    # Feature-based modules
+│  │  └─ DisplayCalculator/
+│  │     └─ index.tsx               # Main calculator feature logic
+│  ├─ _components/                  # Shared UI components
 │  │  ├─ CalculatorInput.tsx        # FR-02: Input form component
 │  │  ├─ CalculatorResult.tsx       # FR-03: Result display component
 │  │  ├─ HistoryPanel.tsx           # FR-05: History panel component
 │  │  └─ ThemeTestComponent.tsx     # FR-08: Theme verification component (temporary)
 │  ├─ _hooks/
 │  │  └─ useCalculationHistory.ts   # FR-04: History management hook
-│　　└─ favicon.ico
+│  └─ favicon.ico
 ├─ utils/
 │  ├─ types.ts                      # Global types (Result<T, E>)
+│  ├─ constants.ts                  # Security allowlists
 │  ├─ evaluateExpression.ts         # FR-01: Expression evaluation logic
 │  └─ evaluateExpression.test.ts    # Unit tests for FR-01
 │

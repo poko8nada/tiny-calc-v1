@@ -95,7 +95,7 @@
 
 ### Task 3.1: 入力コンポーネント実装
 
-- [ ] `app/_components/CalculatorInput.tsx` - 数式入力UI（FR-02）
+- [x] `app/_components/CalculatorInput.tsx` - 数式入力UI（FR-02）
   - ターミナル風プロンプト表示（`user@tiny-calc:~$`）
   - リアルタイム式評価
   - 点滅カーソル実装
@@ -120,6 +120,17 @@
 **依存関係**: Task 2.2  
 **成果物**: 計算結果表示UI  
 **完了条件**: 正常結果・エラーの両方が適切に表示されること  
+**テスト**: 手動確認
+
+### Task 3.3: 計算機機能の統合 (Feature Component)
+
+- [x] `app/_features/DisplayCalculator/index.tsx` - 入力と結果の統合
+  - `CalculatorInput` と `CalculatorResult` の配置
+  - 状態管理（useState）によるリアルタイム連携
+
+**依存関係**: Task 3.1, Task 3.2  
+**成果物**: 統合された計算機機能モジュール  
+**完了条件**: 入力した内容が即座に結果エリアに反映されること  
 **テスト**: 手動確認
 
 ---
@@ -163,14 +174,14 @@
 ### Task 5.1: メインページ実装
 
 - [ ] `app/page.tsx` - メインページレイアウト（FR-06）
+  - `DisplayCalculator` フィーチャーの配置
   - デスクトップ: 左70%入力+結果、右30%履歴
   - タブレット: 上下分割レイアウト
   - モバイル: 履歴はアコーディオンまたはドロワー
   - 全コンポーネント統合
-  - 状態管理（useState/useEffect）
   - レスポンシブ対応（Tailwind breakpoints使用）
 
-**依存関係**: Task 3.1, Task 3.2, Task 4.2  
+**依存関係**: Task 3.3, Task 4.2  
 **成果物**: 完全統合されたメインページ  
 **完了条件**: 全機能が統合され、レスポンシブ表示されること  
 **テスト**: 手動確認
