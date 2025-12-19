@@ -38,24 +38,20 @@
   }
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@layer base {
+  html {
+    background-color: var(--color-terminal-bg);
+    color: var(--color-terminal-gold);
+    font-family: var(--font-family-mono);
+  }
 
-html {
-  background-color: var(--color-terminal-bg);
-  color: var(--color-terminal-gold);
-  font-family: var(--font-family-mono);
-}
-
-body {
-  background-color: var(--color-terminal-bg);
-  color: var(--color-terminal-gold);
-  font-family: var(--font-family-mono);
-  line-height: 1.6;
-  letter-spacing: 0.5px;
+  body {
+    background-color: var(--color-terminal-bg);
+    color: var(--color-terminal-gold);
+    font-family: var(--font-family-mono);
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+  }
 }
 
 /* Terminal text effect */
