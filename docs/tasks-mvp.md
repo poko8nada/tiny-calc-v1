@@ -137,9 +137,11 @@
 
 ## Phase 4: 履歴管理機能実装
 
-### Task 4.1: 履歴管理カスタムフック実装
+### Task 4.1: 履歴管理ロジック・カスタムフック実装
 
-- [x] `app/_hooks/useCalculationHistory.ts` - 履歴管理ロジック（FR-04）
+- [x] `utils/historyUtils.ts` - 履歴操作の純粋ロジック分離
+- [x] `utils/historyUtils.test.ts` - 履歴ロジックの単体テスト（Vitest）
+- [x] `app/_hooks/useCalculationHistory.ts` - 履歴管理フック（FR-04）
   - `useCalculationHistory()` フック実装
   - localStorage 永続化（キー: `tiny-calc-history`）
   - 履歴追加（最新100件まで）
@@ -149,8 +151,8 @@
 
 **依存関係**: Task 2.1  
 **成果物**: テスト済み履歴管理ロジック  
-**完了条件**: localStorage連携が正常動作すること  
-**テスト**: 単体テスト推奨（localStorage mock使用）
+**完了条件**: 単体テストがパスし、localStorage連携が正常動作すること  
+**テスト**: 単体テスト必須（Vitest）
 
 ### Task 4.2: 履歴パネルコンポーネント実装
 

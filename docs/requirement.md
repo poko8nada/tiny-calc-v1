@@ -85,23 +85,30 @@
 
 ### 3.2. 計算履歴管理
 
-**FR-04: `useCalculationHistory.ts`**
+**FR-04a: `historyUtils.ts` (Core Logic)**
 
-- **要件**: 計算履歴を管理し、localStorage に永続化
+- **要件**: 履歴データの操作に関する純粋なビジネスロジック
 - **詳細**:
-  - 式と結果をペアで保存
-  - 最新100件まで保持（容量制限）
-  - 新規追加時は先頭に挿入
-  - 履歴のクリア機能
-  - 履歴の再利用（クリック時に式を入力欄に戻す）
-  - localStorage キー: `tiny-calc-history`
-- **関数**: `useCalculationHistory(): { history: CalculationRecord[], addRecord, clear, reuse }`
-- **型**: `CalculationRecord = { id: string, expression: string, result: number, timestamp: number }`
+  - 履歴の追加（最新100件制限、先頭挿入）
+  - 履歴の削除（ID指定）
+  - タイムスタンプとユニークID（UUID）の付与
+  - Reactに依存しない純粋関数として実装し、100%のテストカバレッジを目指す
+- **型**: `HistoryItem = { id: string, expression: string, result: number | string, timestamp: number }`
 - **テスト観点**:
-  - 履歴の追加・削除・クリア
-  - localStorage 同期
-  - 容量制限（100件超過時の削除）
-  - タイムスタンプ記録
+  - 履歴の追加・削除ロジックの正確性
+  - 容量制限（100件超過時の削除）の検証
+
+**FR-04b: `useCalculationHistory.ts` (State & Persistence)**
+
+- **要件**: 計算履歴の状態管理と localStorage への永続化
+- **詳細**:
+  - `historyUtils.ts` を使用して状態を更新
+  - localStorage キー: `tiny-calc-history`
+  - SSR（Next.js）を考慮したハイドレーション制御
+- **関数**: `useCalculationHistory(): { history: HistoryItem[], addHistory, deleteHistory, clearHistory, isInitialized }`
+- **テスト観点**:
+  - localStorage との状態同期
+  - 初期化フラグ（isInitialized）の動作確認
 
 **FR-05: `HistoryPanel.tsx`**
 
@@ -222,11 +229,13 @@ tiny-calc-v1/
 │  │  ├─ HistoryPanel.tsx           # FR-05: History panel component
 │  │  └─ ThemeTestComponent.tsx     # FR-08: Theme verification component (temporary)
 │  ├─ _hooks/
-│  │  └─ useCalculationHistory.ts   # FR-04: History management hook
+│  │  └─ useCalculationHistory.ts   # FR-04b: History management hook
 │  └─ favicon.ico
 ├─ utils/
 │  ├─ types.ts                      # Global types (Result<T, E>)
 │  ├─ constants.ts                  # Security allowlists
+│  ├─ historyUtils.ts               # FR-04a: Pure logic for history management
+│  ├─ historyUtils.test.ts          # Unit tests for history logic
 │  ├─ evaluateExpression.ts         # FR-01: Expression evaluation logic
 │  └─ evaluateExpression.test.ts    # Unit tests for FR-01
 │

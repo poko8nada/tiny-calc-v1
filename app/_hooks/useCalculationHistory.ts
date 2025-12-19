@@ -1,23 +1,16 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-
-export interface HistoryItem {
-  id: string
-  expression: string
-  result: number | string
-  timestamp: number
-}
+import { addHistoryItem, deleteHistoryItem, type HistoryItem } from '@/utils/historyUtils'
 
 const STORAGE_KEY = 'tiny-calc-history'
-const MAX_HISTORY = 100
 
 /**
  * useCalculationHistory Hook
  *
  * Manages the calculation history with:
  * - LocalStorage persistence
- * - Maximum limit of 100 items
+ * - Maximum limit of 100 items (via historyUtils)
  * - CRUD operations (add, delete, clear)
  */
 export function useCalculationHistory() {
@@ -48,25 +41,14 @@ export function useCalculationHistory() {
    * Adds a new calculation to the history
    */
   const addHistory = useCallback((expression: string, result: number | string) => {
-    if (!expression || result === undefined) return
-
-    setHistory(prev => {
-      const newItem: HistoryItem = {
-        id: crypto.randomUUID(),
-        expression,
-        result,
-        timestamp: Date.now(),
-      }
-      // Add to the beginning and limit to MAX_HISTORY
-      return [newItem, ...prev].slice(0, MAX_HISTORY)
-    })
+    setHistory(prev => addHistoryItem(prev, expression, result))
   }, [])
 
   /**
    * Deletes a specific history item by ID
    */
   const deleteHistory = useCallback((id: string) => {
-    setHistory(prev => prev.filter(item => item.id !== id))
+    setHistory(prev => deleteHistoryItem(prev, id))
   }, [])
 
   /**
