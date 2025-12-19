@@ -1,0 +1,86 @@
+'use client'
+
+import { useState, useEffect, useCallback } from 'react'
+
+export interface HistoryItem {
+  id: string
+  expression: string
+  result: number | string
+  timestamp: number
+}
+
+const STORAGE_KEY = 'tiny-calc-history'
+const MAX_HISTORY = 100
+
+/**
+ * useCalculationHistory Hook
+ *
+ * Manages the calculation history with:
+ * - LocalStorage persistence
+ * - Maximum limit of 100 items
+ * - CRUD operations (add, delete, clear)
+ */
+export function useCalculationHistory() {
+  const [history, setHistory] = useState<HistoryItem[]>([])
+  const [isInitialized, setIsInitialized] = useState(false)
+
+  // Load history from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) {
+      try {
+        setHistory(JSON.parse(saved))
+      } catch (e) {
+        console.error('Failed to parse history from localStorage:', e)
+      }
+    }
+    setIsInitialized(true)
+  }, [])
+
+  // Save history to localStorage whenever it changes
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(history))
+    }
+  }, [history, isInitialized])
+
+  /**
+   * Adds a new calculation to the history
+   */
+  const addHistory = useCallback((expression: string, result: number | string) => {
+    if (!expression || result === undefined) return
+
+    setHistory(prev => {
+      const newItem: HistoryItem = {
+        id: crypto.randomUUID(),
+        expression,
+        result,
+        timestamp: Date.now(),
+      }
+      // Add to the beginning and limit to MAX_HISTORY
+      return [newItem, ...prev].slice(0, MAX_HISTORY)
+    })
+  }, [])
+
+  /**
+   * Deletes a specific history item by ID
+   */
+  const deleteHistory = useCallback((id: string) => {
+    setHistory(prev => prev.filter(item => item.id !== id))
+  }, [])
+
+  /**
+   * Clears all history items
+   */
+  const clearHistory = useCallback(() => {
+    setHistory([])
+  }, [])
+
+  return {
+    history,
+    addHistory,
+    deleteHistory,
+    clearHistory,
+    isInitialized,
+  }
+}

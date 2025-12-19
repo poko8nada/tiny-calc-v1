@@ -139,7 +139,7 @@
 
 ### Task 4.1: 履歴管理カスタムフック実装
 
-- [ ] `app/_hooks/useCalculationHistory.ts` - 履歴管理ロジック（FR-04）
+- [x] `app/_hooks/useCalculationHistory.ts` - 履歴管理ロジック（FR-04）
   - `useCalculationHistory()` フック実装
   - localStorage 永続化（キー: `tiny-calc-history`）
   - 履歴追加（最新100件まで）
