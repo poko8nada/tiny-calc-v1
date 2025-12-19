@@ -109,7 +109,7 @@ export default function CalculatorInput({
           onKeyDown={handleKeyDown}
           onSelect={updateCursorPosition}
           onClick={updateCursorPosition}
-          onFocus={(e) => {
+          onFocus={e => {
             setIsFocused(true)
             updateCursorPosition(e)
           }}

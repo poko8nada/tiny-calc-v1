@@ -25,7 +25,10 @@ describe('evaluateExpression', () => {
       // Default precision is 5
       expect(evaluateExpression('1 / 3')).toEqual({ ok: true, value: 0.33333 })
       // Custom precision
-      expect(evaluateExpression('1 / 3', 4)).toEqual({ ok: true, value: 0.3333 })
+      expect(evaluateExpression('1 / 3', 4)).toEqual({
+        ok: true,
+        value: 0.3333,
+      })
     })
   })
 

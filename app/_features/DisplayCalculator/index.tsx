@@ -25,7 +25,7 @@ export default function DisplayCalculator() {
         <CalculatorInput onEvaluate={handleEvaluate} />
       </div>
 
-      <div className='terminal-border p-4 terminal-surface rounded-lg min-h-[100px]'>
+      <div className='terminal-border p-4 terminal-surface rounded-lg min-h-25'>
         <CalculatorResult currentResult={currentResult} />
       </div>
     </>
