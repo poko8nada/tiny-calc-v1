@@ -54,6 +54,7 @@ export default function CalculatorInput({
   }
 
   // Update cursor pixel offset whenever position or input changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: measureRef is a ref
   useEffect(() => {
     if (measureRef.current) {
       setCursorOffset(measureRef.current.offsetWidth)

@@ -72,7 +72,10 @@ export function ThemeTestComponent() {
       {/* Interactive Button */}
       <div className='mb-8'>
         <p className='text-terminal-muted mb-2'>Interactive Glow:</p>
-        <button className='px-4 py-2 bg-terminal-surface border border-terminal-gold text-terminal-gold glow-interactive'>
+        <button
+          type='button'
+          className='px-4 py-2 bg-terminal-surface border border-terminal-gold text-terminal-gold glow-interactive'
+        >
           Hover / Focus Me
         </button>
       </div>
