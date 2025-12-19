@@ -10,6 +10,8 @@ import {
 import { evaluateExpression } from '@/utils/evaluateExpression'
 
 interface CalculatorInputProps {
+  value: string
+  onValueChange: (value: string) => void
   onEvaluate?: (
     expression: string,
     result: number | string,
@@ -19,26 +21,28 @@ interface CalculatorInputProps {
 }
 
 /**
- * CalculatorInput Component
+ * CalculatorInput Component (Controlled)
  *
  * Provides a terminal-style input interface with:
  * - Custom prompt (user@tiny-calc:~$)
  * - Real-time expression evaluation
  * - Blinking cursor effect
  * - Keyboard handling (Enter to submit)
+ * - Controlled value for history reuse support
  */
 export default function CalculatorInput({
+  value,
+  onValueChange,
   onEvaluate,
   onSubmit,
 }: CalculatorInputProps) {
-  const [input, setInput] = useState('')
   const [isFocused, setIsFocused] = useState(false)
   const [cursorPosition, setCursorPosition] = useState(0)
   const [cursorOffset, setCursorOffset] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const measureRef = useRef<HTMLSpanElement>(null)
 
-  // Focus input on mount and when clicking the container
+  // Focus input on mount
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
@@ -53,20 +57,32 @@ export default function CalculatorInput({
     setCursorPosition(target.selectionStart || 0)
   }
 
-  // Update cursor pixel offset whenever position or input changes
+  // Sync cursor position when value changes
+  useEffect(() => {
+    if (inputRef.current) {
+      const currentPos = inputRef.current.selectionStart || 0
+
+      // If the input is not focused, we assume it's an external change (like history reuse)
+      // and move the cursor to the end.
+      if (document.activeElement !== inputRef.current) {
+        setCursorPosition(value.length)
+      } else {
+        setCursorPosition(currentPos)
+      }
+    }
+  }, [value])
+
+  // Update cursor pixel offset whenever position or value changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: measureRef is a ref
   useEffect(() => {
     if (measureRef.current) {
       setCursorOffset(measureRef.current.offsetWidth)
     }
-  }, [cursorPosition, input])
+  }, [cursorPosition, value])
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setInput(value)
-    updateCursorPosition(e)
-
-    // Real-time evaluation
+  // Real-time evaluation whenever value changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: onEvaluate is a callback prop
+  useEffect(() => {
     if (onEvaluate) {
       if (value.trim() === '') {
         onEvaluate('', '', false)
@@ -80,14 +96,18 @@ export default function CalculatorInput({
         onEvaluate(value, result.error, true)
       }
     }
+  }, [value])
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value
+    onValueChange(newValue)
+    updateCursorPosition(e)
   }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && input.trim() !== '') {
-      onSubmit?.(input)
-      setInput('')
+    if (e.key === 'Enter' && value.trim() !== '') {
+      onSubmit?.(value)
       setCursorPosition(0)
-      onEvaluate?.('', '', false)
     } else {
       // Use setTimeout to get the cursor position after the key event has been processed
       setTimeout(() => updateCursorPosition(e), 0)
@@ -105,7 +125,7 @@ export default function CalculatorInput({
         <input
           ref={inputRef}
           type='text'
-          value={input}
+          value={value}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onSelect={updateCursorPosition}
@@ -126,7 +146,7 @@ export default function CalculatorInput({
           className='absolute invisible whitespace-pre pointer-events-none font-mono text-lg'
           aria-hidden='true'
         >
-          {input.substring(0, cursorPosition)}
+          {value.substring(0, cursorPosition)}
         </span>
 
         {/* Custom Blinking Cursor */}

@@ -44,16 +44,16 @@ export default function CalculatorResult({
   }
 
   return (
-    <div className='font-mono p-2'>
+    <div className='font-mono p-2 w-full'>
       {/* Status Header */}
-      <div className='text-terminal-muted mb-3 text-xs uppercase tracking-widest select-none flex justify-between items-center h-5'>
+      <div className='text-terminal-muted mb-4 text-xs uppercase tracking-widest select-none flex justify-between items-center h-5'>
         <span>[ Result ]</span>
       </div>
 
       {/* Result Row */}
-      <div className='flex items-center justify-between gap-4'>
+      <div className='flex items-center justify-between w-full gap-4'>
         <div
-          className={`text-3xl font-bold break-all glow-text ${
+          className={`text-3xl font-bold break-all glow-text flex-grow ${
             currentResult.isError ? 'text-terminal-red' : 'text-terminal-gold'
           }`}
         >
@@ -62,20 +62,22 @@ export default function CalculatorResult({
         </div>
 
         {!currentResult.isError && (
-          <button
-            type='button'
-            onClick={handleCopy}
-            className={`
-              shrink-0 w-28 py-1 border border-terminal-gold text-xs font-bold transition-all duration-200 flex justify-center
-              ${
-                copied
-                  ? 'bg-terminal-gold text-terminal-bg border-terminal-gold'
-                  : 'text-terminal-gold hover:bg-terminal-gold/10 active:scale-95'
-              }
-            `}
-          >
-            {copied ? '[ COPIED! ]' : '[ COPY ]'}
-          </button>
+          <div className='flex-shrink-0'>
+            <button
+              type='button'
+              onClick={handleCopy}
+              className={`
+                w-28 py-1 border border-terminal-gold text-xs font-bold transition-all duration-200 flex justify-center
+                ${
+                  copied
+                    ? 'bg-terminal-gold text-terminal-bg border-terminal-gold'
+                    : 'text-terminal-gold hover:bg-terminal-gold/10 active:scale-95'
+                }
+              `}
+            >
+              {copied ? '[ COPIED! ]' : '[ COPY ]'}
+            </button>
+          </div>
         )}
       </div>
     </div>
