@@ -79,7 +79,7 @@
   - `evaluateExpression(expression: string): Result<number, string>` 実装
   - セキュリティ対策（許可リスト方式）
   - エラーハンドリング（構文エラー、未定義変数、除算ゼロ等）
-- [ ] `utils/evaluateExpression.test.ts` - 単体テスト
+- [x] `utils/evaluateExpression.test.ts` - 単体テスト
   - 正常系テスト（基本四則演算、三角関数、べき乗等）
   - 異常系テスト（不正な式、危険な操作）
   - セキュリティテスト

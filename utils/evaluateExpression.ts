@@ -39,21 +39,30 @@ export function evaluateExpression(expression: string): Result<number, string> {
     return err('Expression cannot be empty')
   }
 
-  // Validate identifiers against allowlist
-  const identifiers = trimmed.match(/[a-zA-Z_]\w*/g)
+  // Validate and normalize identifiers against allowlist
+  // This allows users to type 'SIN(pi)' and have it evaluated as 'sin(PI)'
+  const normalized = trimmed.replace(/[a-zA-Z_]\w*/g, match => {
+    const lower = match.toLowerCase()
+    if (ALLOWED_FUNCTIONS_SET.has(lower)) return lower
+
+    const upper = match.toUpperCase()
+    if (ALLOWED_CONSTANTS_SET.has(upper)) return upper
+
+    return match
+  })
+
+  // Re-check for any unauthorized identifiers after normalization attempt
+  const identifiers = normalized.match(/[a-zA-Z_]\w*/g)
   if (identifiers) {
     for (const id of new Set(identifiers)) {
-      if (
-        !ALLOWED_FUNCTIONS_SET.has(id.toLowerCase()) &&
-        !ALLOWED_CONSTANTS_SET.has(id.toUpperCase())
-      ) {
+      if (!ALLOWED_FUNCTIONS_SET.has(id) && !ALLOWED_CONSTANTS_SET.has(id)) {
         return err(`Unknown identifier: ${id}`)
       }
     }
   }
 
   try {
-    const result = evaluate(trimmed)
+    const result = evaluate(normalized)
 
     if (typeof result !== 'number' || !Number.isFinite(result)) {
       return err(
@@ -71,8 +80,7 @@ export function evaluateExpression(expression: string): Result<number, string> {
       error instanceof Error ? error.message : 'Unknown evaluation error'
 
     if (msg.includes('Division by zero')) return err('Division by zero')
-    if (msg.includes('Unexpected')) return err(`Syntax error: ${msg}`)
 
-    return err(`Error evaluating expression: ${msg}`)
+    return err(`Syntax error: ${msg}`)
   }
 }
