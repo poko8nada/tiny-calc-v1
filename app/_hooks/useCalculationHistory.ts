@@ -1,7 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { addHistoryItem, deleteHistoryItem, type HistoryItem } from '@/utils/historyUtils'
+import { useCallback, useEffect, useState } from 'react'
+import {
+  addHistoryItem,
+  deleteHistoryItem,
+  type HistoryItem,
+} from '@/utils/historyUtils'
 
 const STORAGE_KEY = 'tiny-calc-history'
 
@@ -40,9 +44,12 @@ export function useCalculationHistory() {
   /**
    * Adds a new calculation to the history
    */
-  const addHistory = useCallback((expression: string, result: number | string) => {
-    setHistory(prev => addHistoryItem(prev, expression, result))
-  }, [])
+  const addHistory = useCallback(
+    (expression: string, result: number | string) => {
+      setHistory(prev => addHistoryItem(prev, expression, result))
+    },
+    [],
+  )
 
   /**
    * Deletes a specific history item by ID

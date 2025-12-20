@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
-import { addHistoryItem, deleteHistoryItem, type HistoryItem } from './historyUtils'
+import {
+  addHistoryItem,
+  deleteHistoryItem,
+  type HistoryItem,
+} from './historyUtils'
 
 /**
  * Mock crypto.randomUUID for consistent testing.
@@ -29,12 +33,15 @@ describe('historyUtils', () => {
 
     it('should limit history to 100 items', () => {
       // Create a history with 100 items
-      const currentHistory: HistoryItem[] = Array.from({ length: 100 }, (_, i) => ({
-        id: `id-${i}`,
-        expression: '1+1',
-        result: 2,
-        timestamp: Date.now(),
-      }))
+      const currentHistory: HistoryItem[] = Array.from(
+        { length: 100 },
+        (_, i) => ({
+          id: `id-${i}`,
+          expression: '1+1',
+          result: 2,
+          timestamp: Date.now(),
+        }),
+      )
 
       const result = addHistoryItem(currentHistory, 'new expression', 3)
 
@@ -45,7 +52,9 @@ describe('historyUtils', () => {
     })
 
     it('should return current history if expression is empty', () => {
-      const currentHistory: HistoryItem[] = [{ id: '1', expression: '1+1', result: 2, timestamp: 123 }]
+      const currentHistory: HistoryItem[] = [
+        { id: '1', expression: '1+1', result: 2, timestamp: 123 },
+      ]
       const result = addHistoryItem(currentHistory, '', 2)
       expect(result).toBe(currentHistory)
     })
@@ -64,7 +73,9 @@ describe('historyUtils', () => {
     })
 
     it('should return the same list if id is not found', () => {
-      const currentHistory: HistoryItem[] = [{ id: '1', expression: '1+1', result: 2, timestamp: 123 }]
+      const currentHistory: HistoryItem[] = [
+        { id: '1', expression: '1+1', result: 2, timestamp: 123 },
+      ]
       const result = deleteHistoryItem(currentHistory, 'non-existent')
 
       expect(result).toHaveLength(1)

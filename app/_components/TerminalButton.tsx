@@ -24,12 +24,16 @@ export default function TerminalButton({
   className = '',
   ...props
 }: TerminalButtonProps) {
-  const baseStyles = 'font-mono transition-all duration-200 border select-none outline-none focus:ring-1 focus:ring-offset-1 focus:ring-offset-terminal-bg'
+  const baseStyles =
+    'font-mono transition-all duration-200 border select-none outline-none focus:ring-1 focus:ring-offset-1 focus:ring-offset-terminal-bg'
 
   const variantStyles = {
-    default: 'border-terminal-gold text-terminal-gold hover:bg-terminal-gold hover:text-terminal-bg focus:ring-terminal-gold',
-    danger: 'border-terminal-red text-terminal-red hover:bg-terminal-red hover:text-terminal-bg focus:ring-terminal-red',
-    success: 'border-terminal-mint text-terminal-mint hover:bg-terminal-mint hover:text-terminal-bg focus:ring-terminal-mint',
+    default:
+      'border-terminal-gold text-terminal-gold hover:bg-terminal-gold hover:text-terminal-bg focus:ring-terminal-gold',
+    danger:
+      'border-terminal-red text-terminal-red hover:bg-terminal-red hover:text-terminal-bg focus:ring-terminal-red',
+    success:
+      'border-terminal-mint text-terminal-mint hover:bg-terminal-mint hover:text-terminal-bg focus:ring-terminal-mint',
   }
 
   const sizeStyles = {
