@@ -207,14 +207,14 @@
 
 ### Task 6.1: ターミナル風統合レイアウトへの刷新
 
-- [ ] `app/_features/DisplayCalculator/index.tsx` - レイアウト構造の変更
+- [x] `app/_features/DisplayCalculator/index.tsx` - レイアウト構造の変更
   - 入力・結果エリアを画面上部に固定（Fixed Header）
   - 履歴エリアをメインのスクロール領域に変更
   - PC/モバイル共通のシングルカラム・ターミナル風デザインへの統合
-- [ ] `app/_components/CalculatorResult.tsx` - デザイン微調整
+- [x] `app/_components/CalculatorResult.tsx` - デザイン微調整
   - 結果の色を `terminal-cyan` に変更
   - エラー表示を結果と同じ行に統合し、高さを固定（Layout Shiftの防止）
-- [ ] `app/_components/CalculatorInput.tsx` - プロンプトの調整
+- [x] `app/_components/CalculatorInput.tsx` - プロンプトの調整
   - 統合レイアウトに合わせた余白・フォントサイズの微調整
 
 **依存関係**: Phase 5 完了

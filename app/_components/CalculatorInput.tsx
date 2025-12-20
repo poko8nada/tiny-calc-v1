@@ -72,7 +72,6 @@ export default function CalculatorInput({
     }
   }, [value])
 
-  // Update cursor pixel offset whenever position or value changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: measureRef is a ref
   useEffect(() => {
     if (measureRef.current) {
@@ -80,7 +79,6 @@ export default function CalculatorInput({
     }
   }, [cursorPosition, value])
 
-  // Real-time evaluation whenever value changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: onEvaluate is a callback prop
   useEffect(() => {
     if (onEvaluate) {
@@ -115,9 +113,9 @@ export default function CalculatorInput({
   }
 
   return (
-    <label className='flex items-center font-mono text-lg p-2 cursor-text'>
-      <span className='text-terminal-mint mr-2 shrink-0 select-none'>
-        user@tiny-calc:~$
+    <label className='flex items-center font-mono text-sm cursor-text'>
+      <span className='text-terminal-mint w-6 shrink-0 select-none opacity-50'>
+        $
       </span>
 
       {/* Input Wrapper for Cursor Effect */}
@@ -138,12 +136,13 @@ export default function CalculatorInput({
           className='w-full bg-transparent border-none outline-none text-terminal-gold glow-text caret-transparent'
           spellCheck={false}
           autoComplete='off'
+          placeholder='Input here. "PI + sin(10) + 10000 * .5"'
         />
 
         {/* Mirror element for pixel-perfect measurement */}
         <span
           ref={measureRef}
-          className='absolute invisible whitespace-pre pointer-events-none font-mono text-lg'
+          className='absolute invisible whitespace-pre pointer-events-none font-mono text-sm'
           aria-hidden='true'
         >
           {value.substring(0, cursorPosition)}
