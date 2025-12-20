@@ -4,17 +4,24 @@ import { useState } from 'react'
 import CalculatorInput from '@/app/_components/CalculatorInput'
 import CalculatorResult from '@/app/_components/CalculatorResult'
 import HistoryPanel from '@/app/_components/HistoryPanel'
-import { useCalculationHistory } from '@/app/_hooks/useCalculationHistory'
+import type { useCalculationHistory } from '@/app/_hooks/useCalculationHistory'
+
+interface DisplayCalculatorProps {
+  historyState: ReturnType<typeof useCalculationHistory>
+}
 
 /**
  * DisplayCalculator Feature Component
  *
- * Orchestrates the main calculator logic by integrating:
- * - CalculatorInput: For expression entry
- * - CalculatorResult: For real-time evaluation display
- * - HistoryPanel: For managing and reusing past calculations
+ * Refactored to a "True Terminal" layout:
+ * - No boxes, borders, or container glows.
+ * - Fixed Header: Active command line session pinned to the top.
+ * - Scrollable Body: Past session logs flow underneath.
+ * - Seamless Integration: Input and Result look like a continuous stream.
  */
-export default function DisplayCalculator() {
+export default function DisplayCalculator({
+  historyState,
+}: DisplayCalculatorProps) {
   const [expression, setExpression] = useState('')
   const [currentResult, setCurrentResult] = useState<{
     expression: string
@@ -22,7 +29,7 @@ export default function DisplayCalculator() {
     isError: boolean
   }>({ expression: '', value: '', isError: false })
 
-  const { history, addHistory, deleteHistory, clearHistory } = useCalculationHistory()
+  const { history, addHistory, deleteHistory, clearHistory } = historyState
 
   const handleEvaluate = (
     expr: string,
@@ -33,38 +40,48 @@ export default function DisplayCalculator() {
   }
 
   const handleSubmit = (expr: string) => {
-    // Only add to history if it's a valid calculation
     if (currentResult.value !== '' && !currentResult.isError) {
       addHistory(expr, currentResult.value)
     }
-    // Clear input after submission
     setExpression('')
   }
 
   const handleSelectHistory = (expr: string) => {
     setExpression(expr)
+    // Scroll the parent container to the top
+    const scrollContainer = document.querySelector('.overflow-y-auto')
+    scrollContainer?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
-    <div className='grid grid-cols-1 lg:grid-cols-10 gap-8 items-start'>
-      {/* Main Calculator Area (70% on large screens) */}
-      <div className='lg:col-span-7 flex flex-col gap-6'>
-        <div className='terminal-border p-4 terminal-surface rounded-lg'>
+    <div className='flex flex-col w-full max-w-4xl mx-auto min-h-full px-4 font-mono'>
+      {/*
+        Fixed Header Section:
+        The active prompt is pinned to the top.
+      */}
+      <div className='sticky top-0 z-50 bg-terminal-bg/95 backdrop-blur-sm pt-6 pb-4'>
+        <div className='flex flex-col gap-1 ml-2 pl-4 border-l border-terminal-mint/50'>
+          {/* Active Input Line */}
           <CalculatorInput
             value={expression}
             onValueChange={setExpression}
             onEvaluate={handleEvaluate}
             onSubmit={handleSubmit}
           />
-        </div>
 
-        <div className='terminal-border p-4 terminal-surface rounded-lg min-h-[120px] flex items-center'>
+          {/* Active Result Line */}
           <CalculatorResult currentResult={currentResult} />
         </div>
+
+        {/* Minimalist separator */}
+        <div className='mt-6 border-b border-terminal-border-dim opacity-20 w-full' />
       </div>
 
-      {/* History Panel Area (30% on large screens) */}
-      <div className='lg:col-span-3 terminal-border p-4 terminal-surface rounded-lg h-full min-h-[400px] lg:max-h-[600px]'>
+      {/*
+        Scrollable History Section:
+        Past calculations flow naturally below the active prompt.
+      */}
+      <div className='grow pb-20'>
         <HistoryPanel
           history={history}
           onSelect={handleSelectHistory}

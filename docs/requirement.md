@@ -128,8 +128,10 @@
 
 - **要件**: メインページ（入力、結果、履歴の統合レイアウト）
 - **詳細**:
-  - 画面上部: 入力フォーム + 最新の結果を固定表示（Fixed Header）
-  - 画面下部: 過去の計算履歴をスクロール表示（Scrollable History）
+  - フルスクリーン・シェル・インターフェース: 画面全体をアプリケーションとして構成
+  - 画面最上部: システム情報（名称、バージョン、ステータス）を表示する固定ヘッダー
+  - 画面最下部: 操作ガイド（キーバインド）やバッファ状態を表示する固定フッター
+  - 中央領域: 入力フォーム（上部固定）と計算履歴（スクロール領域）
   - PC/モバイル共通: シングルカラムのターミナル・エミュレータ風レイアウト
   - レスポンシブデザイン
   - ダークモード固定
@@ -227,6 +229,9 @@ tiny-calc-v1/
 │  │  ├─ CalculatorInput.tsx        # FR-02: Input form component
 │  │  ├─ CalculatorResult.tsx       # FR-03: Result display component
 │  │  ├─ HistoryPanel.tsx           # FR-05: History list component
+│  │  ├─ SystemHeader.tsx           # Fixed system information bar
+│  │  ├─ SystemFooter.tsx           # Fixed operation guide bar
+│  │  ├─ TerminalButton.tsx         # Reusable terminal-style button
 │  │  └─ ThemeTestComponent.tsx     # FR-08: Theme verification component (temporary)
 │  ├─ _hooks/
 │  │  └─ useCalculationHistory.ts   # FR-04b: History management hook

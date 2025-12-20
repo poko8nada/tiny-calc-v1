@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import TerminalButton from './TerminalButton'
 
 interface CalculatorResultProps {
   currentResult: {
@@ -13,10 +14,11 @@ interface CalculatorResultProps {
 /**
  * CalculatorResult Component
  *
- * Displays the result of the mathematical evaluation with:
- * - Explicit [ COPY ] action button for better discoverability
- * - Terminal-style gold/amber/red coloring
- * - Visual feedback on successful copy
+ * Displays the result of the mathematical evaluation.
+ * Refactored for seamless integration into the terminal prompt flow:
+ * - No internal padding or background to match the input line
+ * - Reduced font size for errors to prevent layout shifts
+ * - Explicit [ COPY ] action button
  */
 export default function CalculatorResult({
   currentResult,
@@ -35,51 +37,38 @@ export default function CalculatorResult({
     }
   }
 
-  if (currentResult.value === '') {
-    return (
-      <div className='text-terminal-muted italic select-none font-mono p-2'>
-        {'> Waiting for input...'}
-      </div>
-    )
-  }
-
   return (
-    <div className='font-mono p-2 w-full'>
-      {/* Status Header */}
-      <div className='text-terminal-muted mb-4 text-xs uppercase tracking-widest select-none flex justify-between items-center h-5'>
-        <span>[ Result ]</span>
-      </div>
-
-      {/* Result Row */}
-      <div className='flex items-center justify-between w-full gap-4'>
-        <div
-          className={`text-3xl font-bold break-all glow-text flex-grow ${
-            currentResult.isError ? 'text-terminal-red' : 'text-terminal-gold'
-          }`}
-        >
-          <span className='select-none mr-2'>{'>'}</span>
-          {currentResult.value}
+    <div className='font-mono w-full flex items-center min-h-[32px] text-sm'>
+      {currentResult.value === '' ? (
+        <div className='text-terminal-muted select-none text-sm opacity-70 flex items-center'>
+          <span className='w-6 shrink-0'>↳</span>
+          <span>Answer is "5002.59757"</span>
         </div>
-
-        {!currentResult.isError && (
-          <div className='flex-shrink-0'>
-            <button
-              type='button'
-              onClick={handleCopy}
-              className={`
-                w-28 py-1 border border-terminal-gold text-xs font-bold transition-all duration-200 flex justify-center
-                ${
-                  copied
-                    ? 'bg-terminal-gold text-terminal-bg border-terminal-gold'
-                    : 'text-terminal-gold hover:bg-terminal-gold/10 active:scale-95'
-                }
-              `}
-            >
-              {copied ? '[ COPIED! ]' : '[ COPY ]'}
-            </button>
+      ) : (
+        <div className='flex items-center justify-between w-full gap-4'>
+          {/* Result/Error Display Area */}
+          <div
+            className={`font-bold break-all glow-text flex-grow flex items-center ${
+              currentResult.isError ? 'text-terminal-red' : 'text-terminal-cyan'
+            }`}
+          >
+            <span className='select-none w-6 shrink-0 opacity-30'>↳</span>
+            {currentResult.value}
           </div>
-        )}
-      </div>
+
+          {/* Copy Button - Only shown for valid results */}
+          {!currentResult.isError && (
+            <div className='flex-shrink-0'>
+              <TerminalButton
+                onClick={handleCopy}
+                variant={copied ? 'success' : 'default'}
+              >
+                {copied ? 'COPIED!' : 'COPY'}
+              </TerminalButton>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
