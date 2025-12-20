@@ -29,7 +29,7 @@ export default function HistoryPanel({
       {/* History Header / Actions */}
       <div className='flex items-center justify-between mb-6 px-2'>
         <div className='text-terminal-muted uppercase tracking-widest select-none flex items-center gap-2'>
-          <span className='text-xs opacity-70'>[ HISTORY LOG ]</span>
+          <span className='text-xs opacity-80'>[ HISTORY LOG ]</span>
           <div className='h-[1px] w-12 bg-terminal-border-dim opacity-30' />
         </div>
         {history.length > 0 && (
@@ -42,8 +42,8 @@ export default function HistoryPanel({
       {/* History Stream */}
       <div className='flex flex-col gap-6'>
         {history.length === 0 ? (
-          <div className='text-terminal-muted italic px-2 opacity-50'>
-            {'> No records found in buffer.'}
+          <div className='text-terminal-muted px-2 opacity-40'>
+            <pre>{'  $ No records found in buffer.'}</pre>
           </div>
         ) : (
           history.map(item => (
@@ -106,7 +106,7 @@ export default function HistoryPanel({
 
       {/* End of Buffer Indicator */}
       {history.length > 0 && (
-        <div className='mt-12 mb-8 px-2 flex items-center gap-4 opacity-40 select-none'>
+        <div className='mt-12 mb-8 px-2 flex items-center gap-4 opacity-50 select-none'>
           <div className='h-[1px] grow bg-terminal-border-dim' />
           <span className='text-[10px] text-terminal-muted whitespace-nowrap'>
             [ END OF BUFFER ]

@@ -4,7 +4,11 @@ import { useState } from 'react'
 import CalculatorInput from '@/app/_components/CalculatorInput'
 import CalculatorResult from '@/app/_components/CalculatorResult'
 import HistoryPanel from '@/app/_components/HistoryPanel'
-import { useCalculationHistory } from '@/app/_hooks/useCalculationHistory'
+import type { useCalculationHistory } from '@/app/_hooks/useCalculationHistory'
+
+interface DisplayCalculatorProps {
+  historyState: ReturnType<typeof useCalculationHistory>
+}
 
 /**
  * DisplayCalculator Feature Component
@@ -15,7 +19,9 @@ import { useCalculationHistory } from '@/app/_hooks/useCalculationHistory'
  * - Scrollable Body: Past session logs flow underneath.
  * - Seamless Integration: Input and Result look like a continuous stream.
  */
-export default function DisplayCalculator() {
+export default function DisplayCalculator({
+  historyState,
+}: DisplayCalculatorProps) {
   const [expression, setExpression] = useState('')
   const [currentResult, setCurrentResult] = useState<{
     expression: string
@@ -23,7 +29,7 @@ export default function DisplayCalculator() {
     isError: boolean
   }>({ expression: '', value: '', isError: false })
 
-  const { history, addHistory, deleteHistory, clearHistory } = useCalculationHistory()
+  const { history, addHistory, deleteHistory, clearHistory } = historyState
 
   const handleEvaluate = (
     expr: string,
@@ -42,11 +48,13 @@ export default function DisplayCalculator() {
 
   const handleSelectHistory = (expr: string) => {
     setExpression(expr)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    // Scroll the parent container to the top
+    const scrollContainer = document.querySelector('.overflow-y-auto')
+    scrollContainer?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
-    <div className='flex flex-col w-full max-w-4xl mx-auto min-h-screen px-4 font-mono'>
+    <div className='flex flex-col w-full max-w-4xl mx-auto min-h-full px-4 font-mono'>
       {/*
         Fixed Header Section:
         The active prompt is pinned to the top.
