@@ -26,6 +26,78 @@ Always consult Context7 if you plan to deviate from these guidelines.
 
 **Server Component** (fetch data) → **Client Component** (props) → interactivity
 
+## Component Architecture Patterns
+
+### Pattern 1: Direct Import in Features
+
+Features directly import stores, hooks, and libs.
+
+**Use when:**
+
+- Simple, route-specific features
+- No reuse across routes
+- Small to medium complexity
+
+**Example:**
+
+```typescript
+// app/dashboard/_features/UserProfile.tsx
+"use client"
+import { useUserStore } from '@/store/userStore'
+import { formatUserData } from '@/lib/userUtils'
+
+export function UserProfile() {
+  const user = useUserStore(state => state.user)
+  const formatted = formatUserData(user)
+  return <div>{formatted}</div>
+}
+```
+
+**Trade-offs:** Simple, less boilerplate | Harder to test, lower reusability
+
+### Pattern 2: Feature + Presentational Components
+
+Feature handles logic, presentational component receives props.
+
+**Use when:**
+
+- Reusable components across routes
+- Design system/Storybook integration
+- Complex business logic requiring testing
+- Clear Server/Client boundary separation
+
+**Example:**
+
+```typescript
+// app/dashboard/_features/UserProfileFeature.tsx
+"use client"
+import { useUserStore } from '@/store/userStore'
+import { formatUserData } from '@/lib/userUtils'
+import { UserProfileView } from '@/components/UserProfileView'
+
+export function UserProfileFeature() {
+  const user = useUserStore(state => state.user)
+  const formatted = formatUserData(user)
+  return <UserProfileView data={formatted} />
+}
+
+// components/UserProfileView.tsx (reusable, can be Server Component)
+export function UserProfileView({ data }: { data: string }) {
+  return <div>{data}</div>
+}
+```
+
+**Trade-offs:** Testable, reusable, clear separation | More boilerplate
+
+### Decision Framework
+
+Start with **Pattern 1**. Refactor to **Pattern 2** when you encounter:
+
+- Need to reuse component with different data sources
+- Difficulty testing due to coupled dependencies
+- Complex business logic scattered across components
+- Storybook or design system requirements
+
 ## State Management
 
 ### Global State: Zustand (Recommended)
@@ -156,15 +228,6 @@ utils/                     # Pure utilities only (NOT business logic)
 public/                    # Static assets
 ```
 
-### Directory Purpose
-
-- **`lib/`**: Global business logic, domain logic, services
-- **`_lib/`**: Route-specific business logic
-- **`utils/`**: Pure utility functions only (formatting, parsing, etc.)
-  - ❌ Do NOT place business logic in `utils/`
-- **`store/`**: Global Zustand stores (state definition only)
-- **`_store/`**: Route-specific Zustand stores (state definition only)
-
 ## Component Organization
 
 ### Components
@@ -175,17 +238,6 @@ public/                    # Static assets
 - Use Layout components for styling wrappers
 
 ### Styling Wrappers
-
-**❌ Anti-pattern**: Using Features as styling wrappers
-
-```tsx
-// ❌ Bad: Feature used only for styling
-<FeatureWrapper>
-  <ActualFeature />
-</FeatureWrapper>
-```
-
-**✅ Recommended**: Use Layout components or Tailwind directly
 
 ```tsx
 // ✅ Good: Layout component in components/layouts/
@@ -205,51 +257,10 @@ public/                    # Static assets
 - Named like `DisplayUserProfile.tsx` or `DisplayUserProfile/index.tsx`
 - **Compose Features in `page.tsx`, not across same-level Features**
 - **Max 1-level nesting**:
-  - Use **composition pattern** and **render props pattern**, no prop drilling
+  - Use **composition pattern** or **render props pattern**, no prop drilling a lot
   - If deeper nesting needed → refactor to parallel Features, add state management, or both
 - Colocate feature-specific hooks/utils inside Feature directory
 - **Single Responsibility Principle**: Each Feature should have one clear purpose
-
-### Composition & Render Props Pattern
-
-**Composition Pattern**:
-
-```tsx
-// ✅ Good: Compose features through children
-function UserProfile({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="profile">
-      <UserHeader />
-      {children}
-      <UserFooter />
-    </div>
-  );
-}
-
-// Usage in page.tsx
-<UserProfile>
-  <UserStats />
-  <UserActivity />
-</UserProfile>;
-```
-
-**Render Props Pattern**:
-
-```tsx
-// ✅ Good: Share logic without nesting
-function DataFetcher({ render }: { render: (data: Data) => React.ReactNode }) {
-  const [data, setData] = useState<Data | null>(null);
-
-  useEffect(() => {
-    fetchData().then(setData);
-  }, []);
-
-  return data ? render(data) : <Loading />;
-}
-
-// Usage
-<DataFetcher render={(data) => <UserProfile data={data} />} />;
-```
 
 ### Global vs Route-specific
 

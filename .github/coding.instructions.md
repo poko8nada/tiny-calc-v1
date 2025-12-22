@@ -24,16 +24,50 @@ Only universal types (e.g., `Result<T, E>`) in `utils/types.ts`
 
 ## State Management
 
-- Global State: Zustand (Recommended): Use Zustand over Context API for global state management.
-- Derived State Principle: Avoid creating redundant state. If state B can be derived from state A, compute B from A.
-- Pure Function First Principle: Extract pure logic into separate testable functions. Keep side effects isolated in hooks.
+- **Derive, Don't Duplicate**: If state B can be computed from state A, compute B from A
+- **Pure Functions First**: Extract pure logic into testable functions. Isolate side effects.
+- **Tool Selection**: Use framework-appropriate stores (Zustand, Pinia, Nanostores, etc.)
+- **Server-driven frameworks**: State lives on server, HTML represents state
 
-## Hook Design Principles
+## Composable Logic Design
 
-1. **Extract pure logic**
-2. **Isolate side effects**
-3. **Accept state as arguments**
-4. **Testability**
+_Applies to: React Hooks, Vue Composables, Svelte Runes, Solid Primitives, etc._
+
+1. **Extract pure logic** - Separate business logic from framework code
+2. **Isolate side effects** - Keep I/O separate from pure logic
+3. **Accept state as arguments** - Make logic testable
+4. **Return computed values** - Return derived state and operations
+
+## Component Architecture Patterns
+
+### Pattern 1: Direct Import
+
+Components directly import stores/utilities/logic.
+
+**Use when:**
+
+- Simple, single-purpose components
+- No reuse needs
+- Small to medium complexity
+
+**Trade-offs:** Simple, less boilerplate | Harder to test, lower reusability
+
+### Pattern 2: Feature Layer + Presentational Components
+
+Feature layer handles logic, components receive props.
+
+**Use when:**
+
+- Reusable across contexts
+- Design systems/Storybook
+- Complex business logic
+- Clear server/client separation needed
+
+**Trade-offs:** Testable, reusable, clear separation | More boilerplate, can be over-engineering
+
+### Decision
+
+Start with **Pattern 1**. Refactor to **Pattern 2** when needed for reuse, testing, or complexity.
 
 ## Error Handling
 
@@ -42,8 +76,8 @@ Only universal types (e.g., `Result<T, E>`) in `utils/types.ts`
 ### Use Result<T, E> Pattern for:
 
 - Internal logic and domain functions
-- Server Actions returning success/error
-- Hooks managing operation outcomes
+- Server Actions/route handlers returning success/error
+- Hooks/Composables managing operations
 
 ### Use try-catch for:
 
@@ -62,8 +96,7 @@ function parseId(input: unknown): Result<string, "Invalid ID"> {
     : { ok: false, error: "Invalid ID" };
 }
 
-// Server Action
-("use server");
+// Server Action (example)
 export async function createPost(
   formData: FormData,
 ): Promise<Result<Post, string>> {
@@ -72,7 +105,6 @@ export async function createPost(
 
   try {
     const post = await db.insert({ title });
-    revalidatePath("/posts");
     return { ok: true, value: post };
   } catch (error) {
     console.error("DB error:", error);
@@ -80,7 +112,7 @@ export async function createPost(
   }
 }
 
-// Hook
+// Hook/Composable (example)
 function useCreatePost() {
   const [result, setResult] = useState<Result<Post, string> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -124,28 +156,17 @@ function useCreatePost() {
 ```typescript
 // ✅ Test: Business logic
 describe("calculateMetrics", () => {
-  it("should calculate correctly with valid data", () => {
-    // Test normal case
-  });
-
-  it("should handle edge cases", () => {
-    // Test abnormal case
-  });
+  it("should calculate correctly with valid data", () => {});
+  it("should handle edge cases", () => {});
 });
 
 // ✅ Test: API calls
 describe("fetchUser", () => {
-  it("should return user on success", async () => {
-    // Mock successful response
-  });
-
-  it("should return error on failure", async () => {
-    // Mock failed response
-  });
+  it("should return user on success", async () => {});
+  it("should return error on failure", async () => {});
 });
 
 // ❌ Don't test: UI components, trivial functions
-// Don't write tests for simple components or formatDate-like utilities
 ```
 
 ### Commands

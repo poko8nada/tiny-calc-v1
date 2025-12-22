@@ -17,15 +17,28 @@
 - **Progressive enhancement**: Works without JS, enhanced with HTMX
 - **Minimal client-side JS**: Let HTMX handle interactions
 
+### State Management
+
+- **No client-side state**: State lives on server
+- **HTML represents state**: Server generates HTML reflecting current state
+- **Stateless requests**: Each request contains all necessary context
+
 ## Project Structure
 
 ```
 src/
 ├── index.tsx              # Entry point
-├── routes/                # Hono route handlers
-│   ├── index.ts           # Route definitions
+├── routes/                # Route definitions (thin layer)
+│   ├── index.ts           # Route registry
 │   ├── posts.ts
 │   └── users.ts
+├── features/              # Business logic + presentation
+│   ├── posts/
+│   │   ├── postService.ts    # Business logic
+│   │   ├── postPresenter.ts  # HTML generation
+│   │   └── postValidator.ts  # Validation (optional)
+│   └── users/
+│       └── ...
 ├── views/                 # Full page templates (Hono JSX)
 │   ├── layout.tsx         # Base layout
 │   ├── home.tsx
@@ -36,15 +49,183 @@ src/
 │   ├── PostCard.tsx
 │   ├── UserProfile.tsx
 │   └── ui/                # Atomic UI components
-├── actions/               # Server-side action handlers
-│   ├── posts.ts
-│   └── users.ts
 ├── utils/                 # Utilities
 │   └── types.ts           # Global types (Result<T,E>)
 └── public/                # Static assets
     ├── styles.css         # Tailwind output
     └── htmx.min.js        # HTMX library
 ```
+
+## Architecture Patterns
+
+### Pattern 1: Simple Route Handlers
+
+Route handler contains logic directly.
+
+**Use when:**
+
+- Simple CRUD operations
+- 1-2 DB queries
+- Minimal business logic
+
+**Example:**
+
+```typescript
+// routes/posts.ts
+posts.get('/', async (c) => {
+  const postList = await db.posts.findMany()
+  return c.html(<PostList posts={postList} />)
+})
+
+posts.delete('/:id', async (c) => {
+  await db.posts.delete({ where: { id: c.req.param('id') } })
+  return c.html('', 200)
+})
+```
+
+**Trade-offs:** Simple, straightforward | Hard to test, logic scattered
+
+### Pattern 2: Service Layer
+
+Service handles business logic, route handler is thin.
+
+**Use when:**
+
+- Multiple data sources
+- Business logic complexity
+- Testing requirements
+
+**Example:**
+
+```typescript
+// features/posts/postService.ts
+export class PostService {
+  async getAllPosts(): Promise<Result<Post[], string>> {
+    try {
+      const posts = await db.posts.findMany()
+      const enriched = await this.enrichWithAuthor(posts)
+      return { ok: true, value: enriched }
+    } catch (error) {
+      console.error('Get posts error:', error)
+      return { ok: false, error: 'Failed to fetch posts' }
+    }
+  }
+
+  async deletePost(id: string): Promise<Result<void, string>> {
+    try {
+      await db.posts.delete({ where: { id } })
+      return { ok: true, value: undefined }
+    } catch (error) {
+      console.error('Delete post error:', error)
+      return { ok: false, error: 'Failed to delete post' }
+    }
+  }
+}
+
+// routes/posts.ts
+const service = new PostService()
+
+posts.get('/', async (c) => {
+  const result = await service.getAllPosts()
+  if (!result.ok) return c.html(<ErrorMessage message={result.error} />, 500)
+  return c.html(<PostList posts={result.value} />)
+})
+
+posts.delete('/:id', async (c) => {
+  const result = await service.deletePost(c.req.param('id'))
+  if (!result.ok) return c.html(<ErrorMessage message={result.error} />, 400)
+  return c.html('', 200)
+})
+```
+
+**Trade-offs:** Testable, organized logic | More files, added abstraction
+
+### Pattern 3: Feature Layer (Service + Presenter)
+
+Full separation: Service (logic) + Presenter (HTML generation).
+
+**Use when:**
+
+- Complex workflows
+- Multiple HTMX endpoints per entity
+- Team collaboration
+- Managing HTMX attributes centrally
+
+**Example:**
+
+```typescript
+// features/posts/postService.ts
+export class PostService {
+  async getAllPosts(): Promise<Result<Post[], string>> {
+    try {
+      const posts = await db.posts.findMany()
+      return { ok: true, value: posts }
+    } catch (error) {
+      console.error('Get posts error:', error)
+      return { ok: false, error: 'Failed to fetch posts' }
+    }
+  }
+}
+
+// features/posts/postPresenter.ts
+import { Context } from 'hono'
+import { PostList } from '@/views/posts/list'
+import { PostCard } from '@/components/PostCard'
+import { ErrorMessage } from '@/components/ui/ErrorMessage'
+
+export class PostPresenter {
+  renderList(c: Context, posts: Post[]) {
+    return c.html(<PostList posts={posts} />)
+  }
+
+  renderCard(c: Context, post: Post) {
+    return c.html(<PostCard post={post} />)
+  }
+
+  renderError(c: Context, message: string, status = 500) {
+    return c.html(<ErrorMessage message={message} />, status)
+  }
+
+  // HTMX config management
+  getDeleteButtonAttrs(postId: string) {
+    return {
+      'hx-delete': `/posts/${postId}`,
+      'hx-target': 'closest article',
+      'hx-swap': 'outerHTML',
+      'hx-confirm': 'Are you sure?'
+    }
+  }
+}
+
+// routes/posts.ts
+const service = new PostService()
+const presenter = new PostPresenter()
+
+posts.get('/', async (c) => {
+  const result = await service.getAllPosts()
+  if (!result.ok) return presenter.renderError(c, result.error)
+  return presenter.renderList(c, result.value)
+})
+
+posts.post('/', async (c) => {
+  const formData = await c.req.formData()
+  const result = await service.createPost(formData)
+  if (!result.ok) return presenter.renderError(c, result.error, 400)
+  return presenter.renderCard(c, result.value)
+})
+
+posts.delete('/:id', async (c) => {
+  const result = await service.deletePost(c.req.param('id'))
+  if (!result.ok) return presenter.renderError(c, result.error, 400)
+  return c.html('', 200)
+})
+```
+
+**Trade-offs:** Highly organized, testable, HTMX centralized | Most boilerplate
+
+### Decision Framework
+
+Start with **Pattern 1**. Move to **Pattern 2** for medium complexity. Use **Pattern 3** for complex applications or when HTMX attribute management becomes unwieldy.
 
 ## Hono JSX Patterns
 
@@ -106,7 +287,7 @@ export const PostCard = ({ post }: { post: Post }) => (
 
 ## Route Handlers
 
-### Pattern
+### Simple Pattern (Pattern 1)
 
 ```typescript
 // routes/posts.ts
@@ -116,36 +297,22 @@ import { PostCard } from '../components/PostCard';
 
 const posts = new Hono();
 
-// Full page
 posts.get('/', async (c) => {
   const postList = await db.posts.findMany();
   return c.html(<PostList posts={postList} />);
 });
 
-// Partial update (HTMX)
 posts.delete('/:id', async (c) => {
-  const id = c.req.param('id');
-
-  const result = await deletePost(id);
-
-  if (!result.ok) {
-    return c.html(<div class="error">{result.error}</div>, 400);
-  }
-
-  // Return empty for swap="outerHTML" delete
+  await db.posts.delete({ where: { id: c.req.param('id') } });
   return c.html('', 200);
 });
 
-// Create (returns new card)
 posts.post('/', async (c) => {
   const formData = await c.req.formData();
-  const result = await createPost(formData);
-
-  if (!result.ok) {
-    return c.html(<div class="error">{result.error}</div>, 400);
-  }
-
-  return c.html(<PostCard post={result.value} />);
+  const post = await db.posts.create({
+    title: formData.get('title') as string
+  });
+  return c.html(<PostCard post={post} />);
 });
 
 export default posts;
@@ -206,38 +373,6 @@ return c.html(<ErrorMessage />, 400);
 return c.redirect('/posts');
 ```
 
-## Actions Pattern
-
-```typescript
-// actions/posts.ts
-import { Result } from "../utils/types";
-
-export async function createPost(
-  formData: FormData,
-): Promise<Result<Post, string>> {
-  const title = formData.get("title");
-  if (!title) return { ok: false, error: "Title required" };
-
-  try {
-    const post = await db.posts.create({ title });
-    return { ok: true, value: post };
-  } catch (error) {
-    console.error("DB error:", error);
-    return { ok: false, error: "Failed to create post" };
-  }
-}
-
-export async function deletePost(id: string): Promise<Result<void, string>> {
-  try {
-    await db.posts.delete({ where: { id } });
-    return { ok: true, value: undefined };
-  } catch (error) {
-    console.error("DB error:", error);
-    return { ok: false, error: "Failed to delete post" };
-  }
-}
-```
-
 ## Cloudflare Workers Considerations
 
 ### Environment Variables
@@ -268,9 +403,28 @@ public/
 
 ## Testing
 
-Focus on route handlers and actions:
+Focus on service layer and route handlers:
 
 ```typescript
+// features/posts/postService.test.ts
+import { describe, it, expect } from "vitest";
+import { PostService } from "./postService";
+
+describe("PostService", () => {
+  it("should return posts on success", async () => {
+    const service = new PostService();
+    const result = await service.getAllPosts();
+    expect(result.ok).toBe(true);
+  });
+
+  it("should handle errors", async () => {
+    const service = new PostService();
+    // Mock DB error
+    const result = await service.getAllPosts();
+    expect(result.ok).toBe(false);
+  });
+});
+
 // routes/posts.test.ts
 import { describe, it, expect } from "vitest";
 import app from "./index";
@@ -298,6 +452,8 @@ describe("POST /posts", () => {
 | ------------- | ----------------------- | --------------------------- |
 | Rendering     | RSC + Client Components | Server-rendered JSX         |
 | Routing       | File-based              | Code-based (Hono)           |
+| State         | Client + Server         | Server only                 |
 | Interactivity | React hooks             | HTMX attributes             |
 | Data flow     | Props + State           | Hypermedia (HTML responses) |
 | Bundle        | React runtime           | Minimal (HTMX ~14KB)        |
+| Feature Layer | Container Components    | Service + Presenter classes |
