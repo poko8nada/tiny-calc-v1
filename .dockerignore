@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.github
+docs
+out
+build
+*.log
+.DS_Store
+.gitignore
+.dockerignore

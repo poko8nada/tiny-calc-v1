@@ -240,13 +240,13 @@
 
 ### Task 7.1: Dockerfile 作成
 
-- [ ] `Dockerfile` - マルチステージビルド設定
+- [x] `Dockerfile` - マルチステージビルド設定
   - base, deps, builder, runner ステージ
   - pnpm使用（corepack enable）
   - Node.js 20-alpine
   - ユーザー権限設定（nextjs:nodejs）
   - ポート3000公開
-- [ ] `.dockerignore` - 不要ファイル除外設定
+- [x] `.dockerignore` - 不要ファイル除外設定
 
 **依存関係**: Phase 6完了  
 **成果物**: Cloud Run用Dockerイメージ定義  
