@@ -1,15 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { useCalculateStore } from '../_store/useCalculateStore'
 import TerminalButton from './TerminalButton'
-
-interface CalculatorResultProps {
-  currentResult: {
-    expression: string
-    value: number | string
-    isError: boolean
-  }
-}
 
 /**
  * CalculatorResult Component
@@ -20,16 +13,16 @@ interface CalculatorResultProps {
  * - Reduced font size for errors to prevent layout shifts
  * - Explicit [ COPY ] action button
  */
-export default function CalculatorResult({
-  currentResult,
-}: CalculatorResultProps) {
+export default function CalculatorResult() {
+  const result = useCalculateStore(state => state.result)
+
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
-    if (currentResult.value === '' || currentResult.isError) return
+    if (!result.ok) return
 
     try {
-      await navigator.clipboard.writeText(currentResult.value.toString())
+      await navigator.clipboard.writeText(result.value.toString())
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
@@ -38,27 +31,27 @@ export default function CalculatorResult({
   }
 
   return (
-    <div className='font-mono w-full flex items-center min-h-[32px] text-sm'>
-      {currentResult.value === '' ? (
+    <div className='font-mono w-full flex items-center min-h-8 text-sm'>
+      {!result.ok && result.error === 'empty' ? (
         <div className='text-terminal-muted select-none text-sm opacity-70 flex items-center'>
           <span className='w-6 shrink-0'>↳</span>
-          <span>Answer is "5002.59757"</span>
+          <span>Exaple answer: "5002.59757"</span>
         </div>
       ) : (
         <div className='flex items-center justify-between w-full gap-4'>
           {/* Result/Error Display Area */}
           <div
-            className={`font-bold break-all glow-text flex-grow flex items-center ${
-              currentResult.isError ? 'text-terminal-red' : 'text-terminal-cyan'
+            className={`font-bold break-all glow-text grow flex items-center ${
+              !result.ok ? 'text-terminal-red' : 'text-terminal-cyan'
             }`}
           >
             <span className='select-none w-6 shrink-0 opacity-30'>↳</span>
-            {currentResult.value}
+            {!result.ok ? result.error : result.value}
           </div>
 
           {/* Copy Button - Only shown for valid results */}
-          {!currentResult.isError && (
-            <div className='flex-shrink-0'>
+          {!result.ok && (
+            <div className='shrink-0'>
               <TerminalButton
                 onClick={handleCopy}
                 variant={copied ? 'success' : 'default'}

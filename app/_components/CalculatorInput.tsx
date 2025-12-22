@@ -7,18 +7,8 @@ import {
   useRef,
   useState,
 } from 'react'
-import { evaluateExpression } from '@/utils/evaluateExpression'
 
-interface CalculatorInputProps {
-  value: string
-  onValueChange: (value: string) => void
-  onEvaluate?: (
-    expression: string,
-    result: number | string,
-    isError: boolean,
-  ) => void
-  onSubmit?: (expression: string) => void
-}
+import { useCalculateStore } from '../_store/useCalculateStore'
 
 /**
  * CalculatorInput Component (Controlled)
@@ -30,12 +20,11 @@ interface CalculatorInputProps {
  * - Keyboard handling (Enter to submit)
  * - Controlled value for history reuse support
  */
-export default function CalculatorInput({
-  value,
-  onValueChange,
-  onEvaluate,
-  onSubmit,
-}: CalculatorInputProps) {
+export default function CalculatorInput() {
+  const expression = useCalculateStore(state => state.expression)
+  const setExpression = useCalculateStore(state => state.setExpressionAndResult)
+  const submitExpression = useCalculateStore(state => state.submitExpression)
+
   const [isFocused, setIsFocused] = useState(false)
   const [cursorPosition, setCursorPosition] = useState(0)
   const [cursorOffset, setCursorOffset] = useState(0)
@@ -65,46 +54,30 @@ export default function CalculatorInput({
       // If the input is not focused, we assume it's an external change (like history reuse)
       // and move the cursor to the end.
       if (document.activeElement !== inputRef.current) {
-        setCursorPosition(value.length)
+        setCursorPosition(expression.length)
       } else {
         setCursorPosition(currentPos)
       }
     }
-  }, [value])
+  }, [expression])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: measureRef is a ref
   useEffect(() => {
     if (measureRef.current) {
       setCursorOffset(measureRef.current.offsetWidth)
     }
-  }, [cursorPosition, value])
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: onEvaluate is a callback prop
-  useEffect(() => {
-    if (onEvaluate) {
-      if (value.trim() === '') {
-        onEvaluate('', '', false)
-        return
-      }
-
-      const result = evaluateExpression(value)
-      if (result.ok) {
-        onEvaluate(value, result.value, false)
-      } else {
-        onEvaluate(value, result.error, true)
-      }
-    }
-  }, [value])
+  }, [cursorPosition, expression])
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value
-    onValueChange(newValue)
+    setExpression(newValue)
     updateCursorPosition(e)
   }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && value.trim() !== '') {
-      onSubmit?.(value)
+    // Submit on Enter
+    if (e.key === 'Enter' && expression.trim() !== '') {
+      submitExpression()
       setCursorPosition(0)
     } else {
       // Use setTimeout to get the cursor position after the key event has been processed
@@ -123,7 +96,7 @@ export default function CalculatorInput({
         <input
           ref={inputRef}
           type='text'
-          value={value}
+          value={expression}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onSelect={updateCursorPosition}
@@ -136,7 +109,7 @@ export default function CalculatorInput({
           className='w-full bg-transparent border-none outline-none text-terminal-gold glow-text caret-transparent'
           spellCheck={false}
           autoComplete='off'
-          placeholder='Input here. "PI + sin(10) + 10000 * .5"'
+          placeholder='Input here   : "PI+sin(10)+10000*.5"'
         />
 
         {/* Mirror element for pixel-perfect measurement */}
@@ -145,7 +118,7 @@ export default function CalculatorInput({
           className='absolute invisible whitespace-pre pointer-events-none font-mono text-sm'
           aria-hidden='true'
         >
-          {value.substring(0, cursorPosition)}
+          {expression.substring(0, cursorPosition)}
         </span>
 
         {/* Custom Blinking Cursor */}
