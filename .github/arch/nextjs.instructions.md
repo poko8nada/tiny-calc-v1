@@ -26,6 +26,65 @@ Always consult Context7 if you plan to deviate from these guidelines.
 
 **Server Component** (fetch data) → **Client Component** (props) → interactivity
 
+## State Management
+
+### Global State: Zustand (Recommended)
+
+- Use Zustand over Context API for global state
+- **Separation of Concerns**: State definition and logic must be separate
+- Store contains only state definition
+- Business logic goes in `lib/` or `_lib/`
+
+### Store Structure
+
+```typescript
+// store/userStore.ts - State only
+import { create } from "zustand";
+
+type UserState = {
+  user: User | null;
+  setUser: (user: User | null) => void;
+};
+
+export const useUserStore = create<UserState>((set) => ({
+  user: null,
+  setUser: (user) => set({ user }),
+}));
+
+// lib/userActions.ts - Logic (testable)
+export function validateUser(user: User): Result<User, string> {
+  if (!user.email) return { ok: false, error: "Email required" };
+  return { ok: true, value: user };
+}
+
+export async function fetchAndSetUser(userId: string) {
+  try {
+    const user = await fetchUser(userId);
+    useUserStore.getState().setUser(user);
+    return { ok: true, value: user };
+  } catch (error) {
+    console.error("Fetch user error:", error);
+    return { ok: false, error: "Failed to fetch user" };
+  }
+}
+```
+
+### Derived State Principle
+
+- Avoid redundant state
+- If state B can be derived from state A, compute B from A
+- Use selectors or computed values instead of storing derived data
+
+```typescript
+// ❌ Bad: Redundant state
+const [users, setUsers] = useState<User[]>([]);
+const [activeUsers, setActiveUsers] = useState<User[]>([]);
+
+// ✅ Good: Derived state
+const [users, setUsers] = useState<User[]>([]);
+const activeUsers = users.filter((u) => u.isActive);
+```
+
 ## Project Structure
 
 ### Colocation Rules
@@ -55,6 +114,11 @@ app/
 │   │       └── useUserData.ts        # Feature-specific hook
 │   ├── _hooks/              # Shared across route features
 │   ├── _actions/            # Route-specific server actions
+│   ├── _lib/                # Route-specific business logic
+│   │   ├── userLogic.ts
+│   │   └── userLogic.test.ts
+│   ├── _store/              # Route-specific Zustand stores
+│   │   └── dashboardStore.ts
 │   └── _config/             # Route-specific config
 ├── blog/
 │   ├── [slug]/              # Dynamic route
@@ -65,6 +129,7 @@ app/
 │   ├── _features/
 │   ├── _hooks/
 │   ├── _actions/
+│   ├── _lib/
 │   └── _config/
 ├── page.tsx                # Root page
 ├── loading.tsx             # Root loading
@@ -73,13 +138,32 @@ app/
 
 components/                # Global shared UI
 ├── ui/                     # Atomic UI pieces (shadcn/ui, primitives)
+├── layouts/                # Layout components (PageLayout, SectionLayout)
 └── ...                     # Custom global components
 
 hooks/                     # Global shared hooks
-utils/                     # Global utilities
-└── types.ts                # Global types only (e.g., Result<T,E>)
+lib/                       # Global business logic
+├── userActions.ts
+├── userActions.test.ts
+├── auth.ts
+└── api.ts
+store/                     # Global Zustand stores
+├── userStore.ts
+└── appStore.ts
+utils/                     # Pure utilities only (NOT business logic)
+├── format.ts              # Date formatting, string manipulation, etc.
+└── types.ts               # Global types only (e.g., Result<T,E>)
 public/                    # Static assets
 ```
+
+### Directory Purpose
+
+- **`lib/`**: Global business logic, domain logic, services
+- **`_lib/`**: Route-specific business logic
+- **`utils/`**: Pure utility functions only (formatting, parsing, etc.)
+  - ❌ Do NOT place business logic in `utils/`
+- **`store/`**: Global Zustand stores (state definition only)
+- **`_store/`**: Route-specific Zustand stores (state definition only)
 
 ## Component Organization
 
@@ -88,6 +172,32 @@ public/                    # Static assets
 - Small UI pieces, usually children of Features
 - OK to compose UI primitives (shadcn/ui, Radix, etc.)
 - **Do not import Features into Components**
+- Use Layout components for styling wrappers
+
+### Styling Wrappers
+
+**❌ Anti-pattern**: Using Features as styling wrappers
+
+```tsx
+// ❌ Bad: Feature used only for styling
+<FeatureWrapper>
+  <ActualFeature />
+</FeatureWrapper>
+```
+
+**✅ Recommended**: Use Layout components or Tailwind directly
+
+```tsx
+// ✅ Good: Layout component in components/layouts/
+<PageLayout>
+  <ActualFeature />
+</PageLayout>
+
+// ✅ Good: Tailwind classes directly
+<div className="container mx-auto p-4">
+  <ActualFeature />
+</div>
+```
 
 ### Features
 
@@ -95,14 +205,56 @@ public/                    # Static assets
 - Named like `DisplayUserProfile.tsx` or `DisplayUserProfile/index.tsx`
 - **Compose Features in `page.tsx`, not across same-level Features**
 - **Max 1-level nesting**:
-  - Use composition pattern, no prop drilling
-  - If deeper nesting needed → refactor to parallel Features, add useContext, or both
+  - Use **composition pattern** and **render props pattern**, no prop drilling
+  - If deeper nesting needed → refactor to parallel Features, add state management, or both
 - Colocate feature-specific hooks/utils inside Feature directory
+- **Single Responsibility Principle**: Each Feature should have one clear purpose
+
+### Composition & Render Props Pattern
+
+**Composition Pattern**:
+
+```tsx
+// ✅ Good: Compose features through children
+function UserProfile({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="profile">
+      <UserHeader />
+      {children}
+      <UserFooter />
+    </div>
+  );
+}
+
+// Usage in page.tsx
+<UserProfile>
+  <UserStats />
+  <UserActivity />
+</UserProfile>;
+```
+
+**Render Props Pattern**:
+
+```tsx
+// ✅ Good: Share logic without nesting
+function DataFetcher({ render }: { render: (data: Data) => React.ReactNode }) {
+  const [data, setData] = useState<Data | null>(null);
+
+  useEffect(() => {
+    fetchData().then(setData);
+  }, []);
+
+  return data ? render(data) : <Loading />;
+}
+
+// Usage
+<DataFetcher render={(data) => <UserProfile data={data} />} />;
+```
 
 ### Global vs Route-specific
 
-- **Global** (`components/`, `hooks/`, `utils/`): Used across multiple routes
-- **Route-specific** (`_components/`, `_features/`, `_hooks/`): Used only within that route
+- **Global** (`components/`, `hooks/`, `lib/`, `store/`): Used across multiple routes
+- **Route-specific** (`_components/`, `_features/`, `_hooks/`, `_lib/`, `_store/`): Used only within that route
 
 ## Loading & Error Handling
 

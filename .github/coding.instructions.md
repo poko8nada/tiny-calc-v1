@@ -22,6 +22,19 @@
 
 Only universal types (e.g., `Result<T, E>`) in `utils/types.ts`
 
+## State Management
+
+- Global State: Zustand (Recommended): Use Zustand over Context API for global state management.
+- Derived State Principle: Avoid creating redundant state. If state B can be derived from state A, compute B from A.
+- Pure Function First Principle: Extract pure logic into separate testable functions. Keep side effects isolated in hooks.
+
+## Hook Design Principles
+
+1. **Extract pure logic**
+2. **Isolate side effects**
+3. **Accept state as arguments**
+4. **Testability**
+
 ## Error Handling
 
 ### Never use exceptions for control flow
@@ -59,6 +72,7 @@ export async function createPost(
 
   try {
     const post = await db.insert({ title });
+    revalidatePath("/posts");
     return { ok: true, value: post };
   } catch (error) {
     console.error("DB error:", error);
@@ -69,14 +83,17 @@ export async function createPost(
 // Hook
 function useCreatePost() {
   const [result, setResult] = useState<Result<Post, string> | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const create = async (formData: FormData) => {
+    setIsLoading(true);
     const res = await createPost(formData);
     setResult(res);
+    setIsLoading(false);
     return res;
   };
 
-  return { create, result };
+  return { create, result, isLoading };
 }
 ```
 
@@ -98,9 +115,38 @@ function useCreatePost() {
 
 - No E2E tests
 - Test business logic and critical functions only
-- When connecting to API, tests for both normal and abnormal.
+- When connecting to API, tests for both normal and abnormal cases
 - Skip UI components and trivial code
 - Place `*.test.ts(x)` adjacent to source files
+
+### What to Test
+
+```typescript
+// ✅ Test: Business logic
+describe("calculateMetrics", () => {
+  it("should calculate correctly with valid data", () => {
+    // Test normal case
+  });
+
+  it("should handle edge cases", () => {
+    // Test abnormal case
+  });
+});
+
+// ✅ Test: API calls
+describe("fetchUser", () => {
+  it("should return user on success", async () => {
+    // Mock successful response
+  });
+
+  it("should return error on failure", async () => {
+    // Mock failed response
+  });
+});
+
+// ❌ Don't test: UI components, trivial functions
+// Don't write tests for simple components or formatDate-like utilities
+```
 
 ### Commands
 
