@@ -1,3 +1,5 @@
+import { normalized } from '@/utils/normalizeExpression'
+
 /**
  * HistoryItem Interface
  * Represents a single calculation record in the history
@@ -5,7 +7,7 @@
 export interface HistoryItem {
   id: string
   expression: string
-  result: number | string
+  result: number
   timestamp: number
 }
 
@@ -21,13 +23,15 @@ const MAX_HISTORY = 100
 export function addHistoryItem(
   currentHistory: HistoryItem[],
   expression: string,
-  result: number | string,
+  result: number,
 ): HistoryItem[] {
   if (!expression || result === undefined) return currentHistory
 
+  const normalizedExpr = normalized(expression).replace(/\s+/g, '')
+
   const newItem: HistoryItem = {
     id: crypto.randomUUID(),
-    expression,
+    expression: normalizedExpr,
     result,
     timestamp: Date.now(),
   }

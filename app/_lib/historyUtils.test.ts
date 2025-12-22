@@ -24,7 +24,7 @@ describe('historyUtils', () => {
 
       expect(result).toHaveLength(1)
       expect(result[0]).toMatchObject({
-        expression: '1 + 1',
+        expression: '1+1',
         result: 2,
         id: MOCK_UUID,
         timestamp: expect.any(Number),
@@ -46,7 +46,7 @@ describe('historyUtils', () => {
       const result = addHistoryItem(currentHistory, 'new expression', 3)
 
       expect(result).toHaveLength(100)
-      expect(result[0].expression).toBe('new expression')
+      expect(result[0].expression).toBe('newexpression')
       // The last item from the original history should be removed
       expect(result.find(item => item.id === 'id-99')).toBeUndefined()
     })

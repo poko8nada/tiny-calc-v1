@@ -63,11 +63,11 @@ describe('evaluateExpression', () => {
     it('should return error for empty expression', () => {
       expect(evaluateExpression('')).toEqual({
         ok: false,
-        error: 'Expression cannot be empty',
+        error: 'empty',
       })
       expect(evaluateExpression('   ')).toEqual({
         ok: false,
-        error: 'Expression cannot be empty',
+        error: 'empty',
       })
     })
 
