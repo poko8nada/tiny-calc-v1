@@ -20,13 +20,14 @@
 
 ### MVP
 
-- **フロントエンド**: Next.js 15+ (App Router)
+- **フロントエンド**: Next.js 16+ (App Router)
 - **バックエンド**: なし (SSR/Standalone mode)
 - **ホスティング**: Google Cloud Run
 - **認証**: なし
-- **状態管理**: React Hooks (useState / useEffect)
-- **スタイリング/コンポーネント**: Tailwind CSS（Terminal theme固定）
+- **状態管理**: Zustand / React Hooks
+- **スタイリング/コンポーネント**: Tailwind CSS v4（Terminal theme固定）
 - **テスト**: Vitest（主要ロジックのみ）
+- **リンター/フォーマッタ**: Biome
 - **データベース**: なし (localStorage利用)
 - **その他**: math.js (式評価)
 - **フォント**: Fira Code (monospace)
@@ -221,10 +222,12 @@ tiny-calc-v1/
 ├─ app/
 │  ├─ layout.tsx                    # FR-07: Root layout
 │  ├─ page.tsx                      # FR-06: Main page (Entry point)
-│  ├─ globals.css                   # Tailwind styles + Terminal effects
+│  ├─ globals.css                   # Tailwind v4 styles + Terminal effects
 │  ├─ _features/                    # Feature-based modules
-│  │  └─ DisplayCalculator/
-│  │     └─ index.tsx               # FR-06: Main calculator feature (Fixed Header + History)
+│  │  ├─ DisplayCalculator/
+│  │  │  └─ index.tsx               # FR-06: Main calculator feature (Fixed Header)
+│  │  └─ DisplayHistory/
+│  │     └─ index.tsx               # FR-05: History display feature (Scrollable Body)
 │  ├─ _components/                  # Shared UI components
 │  │  ├─ CalculatorInput.tsx        # FR-02: Input form component
 │  │  ├─ CalculatorResult.tsx       # FR-03: Result display component
@@ -233,26 +236,24 @@ tiny-calc-v1/
 │  │  ├─ SystemFooter.tsx           # Fixed operation guide bar
 │  │  ├─ TerminalButton.tsx         # Reusable terminal-style button
 │  │  └─ ThemeTestComponent.tsx     # FR-08: Theme verification component (temporary)
-│  ├─ _hooks/
-│  │  └─ useCalculationHistory.ts   # FR-04b: History management hook
+│  ├─ _lib/                         # Feature-specific logic & tests
+│  │  ├─ evaluateExpression.ts      # FR-01: Expression evaluation logic
+│  │  ├─ evaluateExpression.test.ts # Unit tests for FR-01
+│  │  ├─ historyUtils.ts            # FR-04a: Pure logic for history management
+│  │  └─ historyUtils.test.ts       # Unit tests for history logic
+│  ├─ _store/                       # Zustand stores
+│  │  └─ useCalculateStore.ts       # Global state management
 │  └─ favicon.ico
-├─ utils/
+├─ utils/                           # Global utilities
 │  ├─ types.ts                      # Global types (Result<T, E>)
-│  ├─ constants.ts                  # Security allowlists
-│  ├─ historyUtils.ts               # FR-04a: Pure logic for history management
-│  ├─ historyUtils.test.ts          # Unit tests for history logic
-│  ├─ evaluateExpression.ts         # FR-01: Expression evaluation logic
-│  └─ evaluateExpression.test.ts    # Unit tests for FR-01
-│
-├─ components/                      # Global shared UI (if needed)
+│  └─ normalizeExpression.ts        # Expression normalization logic
 ├─ public/
 │  └─ og.png (1200x630px)
 ├─ Dockerfile                       # Cloud Run container definition
 ├─ .dockerignore                    # Docker ignore patterns
-├─ cloudbuild.yaml                  # Cloud Build configuration (optional)
-├─ package.json                     # + mathjs dependency
-├─ next.config.js                   # output: 'standalone' for Cloud Run
-├─ tailwind.config.ts               # Tailwind config with terminal theme
+├─ biome.json                       # Biome configuration
+├─ package.json                     # Dependencies & scripts
+├─ next.config.ts                   # output: 'standalone' for Cloud Run
 └─ tsconfig.json
 ```
 
@@ -286,29 +287,27 @@ tiny-calc-v1/
 
 **背景カラー**
 
-- Background: `#0C0C0C` - ページ背景（ほぼ黒）
-- Surface: `#1A1A1A` - カード・パネル背景（チャコール）
-- Surface highlight: `#242424` - ホバー時の背景
+- Background: `#0a0a0a` - ページ背景（ほぼ黒）
+- Surface: `#1a1a1a` - カード・パネル背景（チャコール）
+- Surface highlight: `#2a2a2a` - ホバー時の背景
 
 **テキストカラー**
 
-- Text primary: `#FFD700` - メインテキスト（ゴールド）
-- Text secondary: `#FFA500` - サブテキスト（オレンジ）
-- Text muted: `#CC8400` - 非アクティブテキスト
-- Prompt: `#00D787` - プロンプト記号（シアングリーン）
+- Text primary: `#ffd700` - メインテキスト（ゴールド / terminal-gold）
+- Text secondary: `#ffb347` - サブテキスト（アンバー / terminal-amber）
+- Text muted: `#c2c2c2` - 非アクティブテキスト（グレー / terminal-muted）
+- Cyan: `#00d4ff` - 結果表示（シアン / terminal-cyan）
+- Mint: `#00ff88` - プロンプト・成功（ミント / terminal-mint）
 
 **ボーダー・装飾**
 
-- Border: `#FFA500` - 境界線（アンバー - dim）
-- Border dim: `#CC8400` - 薄いボーダー
-- Glow: `rgba(255, 215, 0, 0.3)` - テキストグロー効果
+- Border dim: `#444444` - 薄いボーダー
+- Glow: `rgb(255 215 0 / 0.3)` - テキストグロー効果
 
 **セマンティックカラー**
 
-- Success: `#5AF78E` - 成功状態、完了（ミントグリーン）
-- Warning: `#FFA500` - 警告、注意（オレンジ）
-- Error: `#FF6B6B` - エラー、削除（ソフトレッド）
-- Info: `#00D787` - 情報、ヘルプ（シアングリーン）
+- Success: `#00ff88` - 成功状態、完了（ミントグリーン）
+- Error: `#ff4444` - エラー、削除（レッド）
 
 **インタラクティブ要素**
 
@@ -484,15 +483,17 @@ ENV PORT=3000
 CMD ["node", "server.js"]
 ```
 
-### next.config.js 設定
+### next.config.ts 設定
 
-```javascript
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  output: "standalone", // Cloud Run用
+```typescript
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  output: "standalone",
+  reactCompiler: true,
 };
 
-module.exports = nextConfig;
+export default nextConfig;
 ```
 
 ### デプロイコマンド例

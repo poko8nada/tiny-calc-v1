@@ -4,9 +4,9 @@
 
 ### Task 1.1: プロジェクト初期化・依存関係インストール
 
-- [x] `package.json` - 依存関係追加（Next.js 16, React 19, Tailwind CSS, math.js, Vitest）
+- [x] `package.json` - 依存関係追加（Next.js 16, React 19, Tailwind CSS v4, math.js, Vitest, Zustand, Biome）
 - [x] `pnpm install` - 依存パッケージインストール
-- [x] `next.config.js` - Cloud Run用設定（output: 'standalone'）
+- [x] `next.config.ts` - Cloud Run用設定（output: 'standalone'）
 - [x] `tsconfig.json` - TypeScript設定確認
 - [x] `.gitignore` - 不要ファイル除外設定
 
@@ -15,11 +15,10 @@
 **完了条件**: `pnpm dev` でローカルサーバーが起動すること  
 **テスト**: 手動確認
 
-### Task 1.2: Tailwind CSS + ターミナルテーマ設定
+### Task 1.2: Tailwind CSS v4 + ターミナルテーマ設定
 
-- [x] `tailwind.config.ts` - ターミナルテーマ用カラーパレット設定（Modern Terminal - Amber/Black）
-- [x] `app/globals.css` - ターミナルエフェクト（glow, cursor blink, ASCII border）追加
-- [x] `postcss.config.js` - PostCSS設定確認
+- [x] `app/globals.css` - `@theme` によるカラーパレット・エフェクト（glow, cursor blink, ASCII border）定義
+- [x] `postcss.config.mjs` - PostCSS設定確認
 
 **依存関係**: Task 1.1  
 **成果物**: ターミナル風スタイリング基盤  
@@ -75,11 +74,11 @@
 
 ### Task 2.2: 式評価ロジック実装
 
-- [x] `utils/evaluateExpression.ts` - math.jsを使用した式評価関数（FR-01）
+- [x] `app/_lib/evaluateExpression.ts` - math.jsを使用した式評価関数（FR-01）
   - `evaluateExpression(expression: string): Result<number, string>` 実装
   - セキュリティ対策（許可リスト方式）
   - エラーハンドリング（構文エラー、未定義変数、除算ゼロ等）
-- [x] `utils/evaluateExpression.test.ts` - 単体テスト
+- [x] `app/_lib/evaluateExpression.test.ts` - 単体テスト
   - 正常系テスト（基本四則演算、三角関数、べき乗等）
   - 異常系テスト（不正な式、危険な操作）
   - セキュリティテスト
@@ -126,7 +125,7 @@
 
 - [x] `app/_features/DisplayCalculator/index.tsx` - 入力と結果の統合
   - `CalculatorInput` と `CalculatorResult` の配置
-  - 状態管理（useState）によるリアルタイム連携
+  - 状態管理（Zustand）によるリアルタイム連携
 
 **依存関係**: Task 3.1, Task 3.2  
 **成果物**: 統合された計算機機能モジュール  
@@ -137,12 +136,12 @@
 
 ## Phase 4: 履歴管理機能実装
 
-### Task 4.1: 履歴管理ロジック・カスタムフック実装
+### Task 4.1: 履歴管理ロジック・ストア実装
 
-- [x] `utils/historyUtils.ts` - 履歴操作の純粋ロジック分離
-- [x] `utils/historyUtils.test.ts` - 履歴ロジックの単体テスト（Vitest）
-- [x] `app/_hooks/useCalculationHistory.ts` - 履歴管理フック（FR-04）
-  - `useCalculationHistory()` フック実装
+- [x] `app/_lib/historyUtils.ts` - 履歴操作の純粋ロジック分離
+- [x] `app/_lib/historyUtils.test.ts` - 履歴ロジックの単体テスト（Vitest）
+- [x] `app/_store/useCalculateStore.ts` - 履歴管理ストア（FR-04）
+  - Zustandによる状態管理実装
   - localStorage 永続化（キー: `tiny-calc-history`）
   - 履歴追加（最新100件まで）
   - 履歴クリア機能
@@ -205,7 +204,7 @@
 
 ## Phase 6: UI/UX 大幅リファクタリング
 
-### Task 6.1: ターミナル風統合レイアウトへの刷新
+### Task 6.1: ターミナル風統合レイアウトへの刷新 (Completed)
 
 - [x] `app/_features/DisplayCalculator/index.tsx` - レイアウト構造の変更
   - 入力・結果エリアを画面上部に固定（Fixed Header）
@@ -222,7 +221,7 @@
 **完了条件**: 入力・結果が固定され、履歴がスムーズにスクロールすること
 **テスト**: 手動確認
 
-### Task 6.2: 固定システムヘッダー・フッターの実装
+### Task 6.2: 固定システムヘッダー・フッターの実装 (Completed)
 
 - [x] `app/_components/SystemHeader.tsx` - システム情報表示バーの実装
 - [x] `app/_components/SystemFooter.tsx` - 操作ガイド・ステータスバーの実装
@@ -256,6 +255,7 @@
 
 ### Task 7.2: Cloud Run デプロイ設定
 
+- [x] `next.config.ts` - `output: 'standalone'` 設定済み
 - [ ] `cloudbuild.yaml` - Cloud Build設定（オプション）
 - [ ] デプロイスクリプト作成（`scripts/deploy.sh`等）
 - [ ] 環境変数設定確認（必要に応じて）
@@ -290,6 +290,8 @@
   - WCAG 2.1 Level AA準拠確認
   - キーボードナビゲーション確認
   - スクリーンリーダー対応確認
+- [ ] リンター・フォーマッタ実行
+  - `pnpm lint` (Biome) でエラーがないこと
 - [ ] 単体テスト実行
   - `pnpm test:run` 全テストパス確認
   - カバレッジ確認（ビジネスロジック >= 80%）
