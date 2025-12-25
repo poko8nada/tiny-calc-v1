@@ -268,15 +268,15 @@
 
 ### Task 7.3: Basic Auth 実装 (Proxy)
 
-- [ ] `proxy.ts` - Basic Auth ロジックの実装
-- [ ] 環境変数による制御 (`BASIC_AUTH_USER`, `BASIC_AUTH_PASSWORD`)
-- [ ] 特定の環境（dev等）でのみ有効化する条件分岐の実装
-- [ ] ローカル環境およびデプロイ環境での動作確認
+- [x] `proxy.ts` - Basic Auth ロジックの実装（dev環境自動スキップ対応）
+- [x] `proxy.test.ts` - ユニットテストの実装
+- [x] 環境変数による制御 (`BASIC_AUTH_USER`, `BASIC_AUTH_PASSWORD`)
+- [x] ローカル環境での動作確認
 
 **依存関係**: Task 1.1  
 **成果物**: セキュリティ保護された環境  
 **完了条件**: 環境変数が設定されている場合にBasic Authダイアログが表示され、認証に成功すること  
-**テスト**: 手動確認
+**テスト**: 単体テストおよび手動確認
 
 ---
 
