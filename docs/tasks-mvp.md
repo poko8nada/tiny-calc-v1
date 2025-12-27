@@ -256,15 +256,23 @@
 ### Task 7.2: Cloud Run デプロイ設定
 
 - [x] `next.config.ts` - `output: 'standalone'` 設定済み
-- [ ] `cloudbuild.yaml` - Cloud Build設定（オプション）
-- [ ] デプロイスクリプト作成（`scripts/deploy.sh`等）
-- [ ] 環境変数設定確認（必要に応じて）
-- [ ] リージョン設定（asia-northeast1推奨）
 
 **依存関係**: Task 7.1  
 **成果物**: デプロイ自動化設定  
 **完了条件**: gcloudコマンドでデプロイ可能な状態  
 **テスト**: 手動確認
+
+### Task 7.3: Basic Auth 実装 (Proxy)
+
+- [x] `proxy.ts` - Basic Auth ロジックの実装（dev環境自動スキップ対応）
+- [x] `proxy.test.ts` - ユニットテストの実装
+- [x] 環境変数による制御 (`BASIC_AUTH_USER`, `BASIC_AUTH_PASSWORD`)
+- [x] ローカル環境での動作確認
+
+**依存関係**: Task 1.1  
+**成果物**: セキュリティ保護された環境  
+**完了条件**: 環境変数が設定されている場合にBasic Authダイアログが表示され、認証に成功すること  
+**テスト**: 単体テストおよび手動確認
 
 ---
 
@@ -272,27 +280,27 @@
 
 ### Task 8.1: ブラウザ互換性・パフォーマンス確認
 
-- [ ] ブラウザ互換性テスト（手動確認）
+- [x] ブラウザ互換性テスト（手動確認）
   - Chrome 90+: 全機能動作確認
   - Firefox 88+: 全機能動作確認
   - Safari 14+: 全機能動作確認
   - モバイル（iOS Safari 14+, Android Chrome 90+）
-- [ ] パフォーマンス測定
+- [x] パフォーマンス測定
   - 式入力時の計算レスポンス: < 100ms
   - localStorage 読み込み: < 50ms
   - 初期ロード時間: < 2秒
   - バンドルサイズ: < 500KB (gzip後)
-- [ ] Lighthouse監査
+- [x] Lighthouse監査
   - Performance: 90+
   - Accessibility: 90+
   - Best Practices: 90+
-- [ ] アクセシビリティ監査（axe DevTools）
+- [x] アクセシビリティ監査（axe DevTools）
   - WCAG 2.1 Level AA準拠確認
   - キーボードナビゲーション確認
   - スクリーンリーダー対応確認
-- [ ] リンター・フォーマッタ実行
+- [x] リンター・フォーマッタ実行
   - `pnpm lint` (Biome) でエラーがないこと
-- [ ] 単体テスト実行
+- [x] 単体テスト実行
   - `pnpm test:run` 全テストパス確認
   - カバレッジ確認（ビジネスロジック >= 80%）
 
@@ -303,20 +311,20 @@
 
 ### Task 8.2: リソース準備・メタデータ設定
 
-- [ ] OGP画像作成・配置
+- [x] OGP画像作成・配置
   - `/public/og.png` (1200x630px)
   - ターミナル風デザイン
   - サービス名・コンセプト表示
-- [ ] Favicon準備・追加
+- [x] Favicon準備・追加
   - `/app/favicon.ico`
   - `/app/icon.png` (512x512px推奨)
   - ターミナル風アイコンデザイン
-- [ ] メタデータ最終確認
+- [x] メタデータ最終確認
   - title: "Tiny Calc - Terminal Style Calculator"
   - description設定
   - OGP設定（og:image, og:title, og:description）
   - Twitter Card設定
-- [ ] ライセンス表記確認
+- [x] ライセンス表記確認
   - math.js (Apache 2.0)
   - Fira Code (OFL 1.1)
   - Tailwind CSS (MIT)
@@ -329,20 +337,16 @@
 
 ### Task 8.3: Cloud Run 本番デプロイ・動作確認
 
-- [ ] Docker イメージビルド
-  - `gcloud builds submit --tag gcr.io/PROJECT_ID/tiny-calc`
-- [ ] Cloud Run デプロイ実行
+- [x] Cloud Run デプロイ実行
   - リージョン: asia-northeast1
   - メモリ: 512Mi
   - CPU: 1
   - 認証: allow-unauthenticated
-- [ ] 本番環境での動作確認
+- [x] 本番環境での動作確認
   - 全機能の動作確認
   - レスポンシブ表示確認
   - パフォーマンス確認
   - エラーハンドリング確認
-- [ ] カスタムドメイン設定（オプション）
-- [ ] SSL証明書確認
 
 **依存関係**: Task 8.2, Task 7.2  
 **成果物**: デプロイ済み本番環境  
@@ -351,13 +355,12 @@
 
 ### Task 8.4: ドキュメント整備
 
-- [ ] README.md 更新
+- [x] README.md 更新
   - プロジェクト概要
   - セットアップ手順
   - 開発コマンド
   - デプロイ手順
   - ライセンス情報
-- [ ] CHANGELOG.md 作成
   - MVP v1.0.0 リリースノート
 - [ ] Phase 2 準備ドキュメント作成
   - 次フェーズで実装する機能リスト
